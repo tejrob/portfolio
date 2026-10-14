@@ -1,0 +1,2063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Ivan Tejada, Creative Lead</title>
+<meta name="description" content="Ivan Tejada, Creative Lead. Portfolio of creative direction, design and social campaigns — selected work for Samsung, Movistar, Peugeot, MediaMarkt and more." />
+<link rel="canonical" href="https://REEMPLAZA-CON-TU-DOMINIO.com/" />
+<meta name="theme-color" content="#e70e0e" />
+<link rel="icon" type="image/png" href="assets/img_001.png" />
+<link rel="apple-touch-icon" href="assets/img_001.png" />
+<!-- Open Graph (para la previsualización al compartir el enlace). Sube og-image.jpg junto al HTML y cambia el dominio de arriba y de abajo por el tuyo real una vez alojado. -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Ivan Tejada — Creative Lead" />
+<meta property="og:description" content="Ivan Tejada, Creative Lead. Portfolio of creative direction, design and social campaigns — selected work for Samsung, Movistar, Peugeot, MediaMarkt and more." />
+<meta property="og:url" content="https://REEMPLAZA-CON-TU-DOMINIO.com/" />
+<meta property="og:image" content="https://REEMPLAZA-CON-TU-DOMINIO.com/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Ivan Tejada — Creative Lead" />
+<meta name="twitter:description" content="Ivan Tejada, Creative Lead. Portfolio of creative direction, design and social campaigns — selected work for Samsung, Movistar, Peugeot, MediaMarkt and more." />
+<meta name="twitter:image" content="https://REEMPLAZA-CON-TU-DOMINIO.com/og-image.jpg" />
+<style>
+  html,body{height:100%;margin:0;background:#f1f1f1;overflow:hidden;}
+  #root{height:100%;}
+  /* simple loader while React boots */
+  #boot{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+        font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#9a9aa0;font-size:14px;
+        letter-spacing:.4px;background:#f1f1f1;z-index:-1;}
+.info-video.vertical{padding-top:0;aspect-ratio:9/16;width:300px;max-width:100%;margin:22px auto 0;}.info-duo{display:flex;gap:18px;justify-content:center;align-items:flex-start;padding:18px;}.info-duo-img{display:block;width:42%;max-width:240px;height:auto;border-radius:8px;}.info-videos{display:flex;flex-direction:column;gap:18px;}.art-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:18px;margin-top:16px;}.art-item{margin:0;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(20,20,50,0.1),inset 0 0 0 0.5px rgba(0,0,0,0.08);}.art-item img,.art-item video{display:block;width:100%;height:auto;}.art-cap{font-size:12px;color:#6b6b78;padding:8px 10px;}.info-gap{height:14px;}.info-media.info-media-cards{background:transparent;box-shadow:none;border-radius:0;overflow:visible;display:flex;flex-direction:column;gap:16px;}.info-media.info-media-cards .info-media-img{border-radius:14px;box-shadow:0 8px 22px rgba(20,20,50,0.12),inset 0 0 0 0.5px rgba(0,0,0,0.06);}</style>
+</head>
+<body>
+<form name="contact" data-netlify="true" netlify-honeypot="bot-field" enctype="multipart/form-data" hidden>
+  <input type="text" name="name" />
+  <input type="email" name="email" />
+  <textarea name="project"></textarea>
+  <input type="file" name="doodle" />
+  <input name="bot-field" />
+</form>
+<div id="boot">Loading…</div>
+<div id="root"></div>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+const {
+  useState,
+  useRef,
+  useEffect,
+  useCallback
+} = React;
+
+/* =========================================================================
+   macOS Desktop Portfolio
+   - Crisp wallpaper, no blur
+   - High-fidelity macOS-style dock icons (recreated in SVG)
+   - Cover-art desktop thumbnails (drop real images into project.img)
+   - Editorial About · Projects-only Work · Contact form + sketch canvas
+   ========================================================================= */
+
+const BG_DATA_URI = "assets/img_001.jpg";
+
+// Dock icons supplied by the user (real assets; black bg made transparent)
+const ICONS = {
+  "12-folder": "assets/img_002.png",
+  "1-aboutme": "assets/img_003.png",
+  "2-Contact": "assets/img_004.png",
+  "3-MyWork": "assets/img_005.png",
+  "4-adobe": "assets/img_006.png",
+  "6-ia": "assets/img_007.png",
+  "7-CV": "assets/img_008.png",
+  "9-instagram": "assets/img_009.png",
+  "10-linkedin": "assets/img_010.png",
+  "11-binn": "assets/img_011.png",
+  "error": "assets/img_012.png",
+  "structure": "assets/img_013.png"
+};
+// Optional form endpoint (Formspree/EmailJS/your own). Empty = capture in-memory + confirm in UI.
+const SUBMIT_ENDPOINT = "";
+const MATPACK_IMG = "assets/img_002.jpg";
+const C4D_MATPACK = "assets/IvanTejada-C4D_matpack.c4d";
+const CV_PDF = "assets/Ivan_Tejada_CV_EN.pdf";
+
+/* ---------- PROJECT DATA --------------------------------------------------
+   To use REAL imagery: set `img` to an uploaded image URL / data-URI.
+   Until then a refined cover-art composition is shown (not a flat gradient).
+   ------------------------------------------------------------------------- */
+
+const PROJECTS = [{
+  id: "sam-support",
+  short: "SAMSUNG, AI Support Videos",
+  img: null,
+  videos: ["-jHVKZLhsHs", "eS-bQpc6iwE", "Dd-SnjhX3Uw"],
+  label: "SAMSUNG, Revolutionizing Support with AI-Driven Videos",
+  cover: "radial-gradient(60% 55% at 28% 22%,rgba(255,255,255,.4),transparent 60%),radial-gradient(90% 90% at 85% 95%,#091266,transparent 60%),linear-gradient(135deg,#1428a0,#3b6fe0)",
+  meta: "Samsung · AI Video · Direction",
+  tags: ["AI Video", "Motion", "Support"],
+  body: "Samsung Support had a massive library of how-to videos, and the usual way of making them was slow going. As Creative Lead, I wanted to find out whether AI could help us make them better and faster, without the content ending up colder or off-brand.\n\nWe brought in AI avatars to front the how-to videos, which let us turn them around much quicker while keeping the same look and tone across the board. AI transcription handled the more tedious parts of the process, so the team could put its time into the things that actually needed a human eye.\n\nIt was built to travel, with the idea of rolling it out across different markets, and we kept an eye on the numbers to see what was landing with people and what wasn't.\n\nMore than anything it was a way of letting AI take the heavy lifting, so the support content could be clearer, quicker to make, and a little easier to actually use."
+}, {
+  id: "sam-planet",
+  short: "SAMSUNG, From Planet to Galaxy",
+  img: null,
+  videos: ["ur_-kNA09lI", {
+    id: "AKBNFN0AuXw",
+    vertical: true
+  }],
+  label: "SAMSUNG, From Planet to Galaxy",
+  cover: "radial-gradient(45% 45% at 70% 30%,#43e3ff,transparent 55%),radial-gradient(120% 120% at 20% 90%,#020024,transparent),linear-gradient(140deg,#04003a,#090979)",
+  meta: "Samsung · Integrated Campaign",
+  tags: ["Campaign", "Creative Direction", "Film"],
+  body: "The brief was the move to Samsung, the kind of thing that usually gets sold as a list of features. I wanted something bigger to hang it on, so the idea became From Planet to Galaxy, built around one question, what if your world was bigger? You start on a familiar planet where everything works, and right next to it sits a whole galaxy you have not explored yet, so changing ecosystem reads as a journey outwards rather than a phone upgrade.\n\nThe film was meant to be a hook, not a manual. Rather than spelling out every feature it sets the tone and points people to the Samsung pages where the phones are explained in full, so it only had to carry the feeling of more, more room to create, sharper cameras, more ways to work and connect, and Smart Switch taking the fear out of moving.\n\nAs Creative Director I developed the concept and the narrative, supervised the main film, and art directed the digital, banner and retail pieces, keeping the look and tone consistent across the campaign."
+}, {
+  id: "sam-awards",
+  short: "SAMSUNG, Award Templates",
+  img: null,
+  seamless: true,
+  mediaPad: true,
+  label: "SAMSUNG, Award Templates",
+  cover: "radial-gradient(70% 60% at 30% 20%,rgba(255,255,255,.35),transparent 55%),linear-gradient(135deg,#d8b9a8,#7d5a52)",
+  meta: "Samsung · Design System",
+  tags: ["Templates", "Design System"],
+  body: "Across Europe, each market was celebrating its local service and support awards in its own way, so the banners, videos and emails looked different from one country to the next.\n\nI pulled it together into one visual system for the whole region, built so any market could pick it up and run with it. I took Samsung’s palette somewhere softer and more approachable, paired it with a bold, eye-catching look that drops easily into any format, from a web banner to a mobile story to an email.\n\nAs Creative Lead I shaped the direction throughout, so wherever an award turned up across Europe, it felt like one brand with one voice."
+}, {
+  id: "randstad",
+  short: "Randstad, AI Visuals",
+  img: null,
+  seamless: true,
+  mediaCards: true,
+  label: "Randstad, AI Visuals for Promotional Impact",
+  cover: "radial-gradient(60% 60% at 75% 25%,#7ab8ff,transparent 55%),linear-gradient(135deg,#13267a,#2d6cdf)",
+  meta: "Randstad · AI Visuals",
+  tags: ["Adobe Firefly", "Branding", "Localisation"],
+  body: "I worked with Randstad on a promotional project built around Adobe Firefly, using its AI to create and edit the branded visuals. The point was to speed up production and make everything easy to localise for different markets and countries, since the AI let us adapt and edit images quickly rather than redoing each one from scratch. It meant we could turn out striking banners that still looked unmistakably like Randstad, with the whole thing running faster and far more flexible than usual."
+}, {
+  id: "movistar",
+  short: "Movistar, Telefónica",
+  img: null,
+  seamless: true,
+  label: "Movistar, Telefónica",
+  cover: "radial-gradient(55% 55% at 78% 22%,#9bf0ff,transparent 55%),linear-gradient(140deg,#00a9e0,#004f8a)",
+  meta: "Movistar Plus+ · Art Direction & Design",
+  tags: ["CRM", "TV Interface", "Campaigns"],
+  body: "I worked on the visual side of Movistar Plus+ as art director and designer, moving across quite a few fronts at once: CRM, the TV experience, and the digital campaigns that brought people in.\n\nA lot of it lived in the email marketing, shaping how those campaigns looked and felt and keeping them recognisably Movistar while adapting each one to different audiences and the moment it would land in.\n\nI also designed a good part of what you see on screen inside the product, the visuals that set the tone and help you find something worth watching.\n\nAround all that ran a steady stream of digital marketing: display banners, social pieces for the big moments like Black Friday, and work that had to look right and actually perform."
+}, {
+  id: "sam-cpc",
+  short: "SAMSUNG CPC",
+  img: null,
+  seamless: true,
+  label: "SAMSUNG CPC",
+  cover: "radial-gradient(80% 80% at 18% 88%,#3a567a,transparent 55%),linear-gradient(135deg,#0d1626,#243b55)",
+  meta: "Samsung · Creative Production",
+  tags: ["Production", "Always-on"],
+  body: "Making a global brand feel consistent, without making everything look the same.\n\nAcross Samsung Support and Samsung Members, the work spans a wide range of digital experiences and content, from landing pages and how-to guides to visual assets, illustrations or video. Each serves a different purpose, audience and market, but all contribute to the same brand experience.\n\nThe creative challenge lies in finding the right visual language for each, balancing clarity, functionality and brand identity across every touchpoint."
+}, {
+  id: "sam-protect",
+  seamless: true,
+  mediaBg: "#3a3560",
+  short: "SAMSUNG, Protect Your Galaxy",
+  img: null,
+  label: "SAMSUNG, Protect Your Galaxy",
+  cover: "radial-gradient(45% 45% at 50% 42%,#6fc7dd,transparent 55%),linear-gradient(140deg,#0b1820,#203a43 55%,#2c5364)",
+  meta: "Samsung · TikTok · Social",
+  tags: ["TikTok", "Pixel Art", "Characters"],
+  body: "Samsung wanted to open a door to a younger generation, so we built Protect Your Galaxy, a series made to live on TikTok. The idea was simple, take the usual how to video and turn it into something people would actually want to watch, short clips that reveal the hidden features of your phone in a way that feels like play rather than a manual.\n\nTo carry it we created a little world with its own cast. On a planet full of threats, our hero Sam sets out to protect her Galaxy through a series of missions, discovering hidden places, taking those missions to other worlds, and sharing everything she learns along the way. The pixel art look gave it a game feel that matched both the platform and the audience."
+}, {
+  id: "cpc-social",
+  short: "CPC, Social & Community",
+  img: null,
+  seamless: true,
+  mediaFlush: true,
+  label: "CPC, Social & Community",
+  cover: "radial-gradient(60% 60% at 30% 25%,#ffb36b,transparent 55%),linear-gradient(135deg,#ee0979,#b3004f)",
+  meta: "Creative Production · Social",
+  tags: ["Social", "Community"],
+  body: "The social side of our work at Samsung: content for the brand’s channels, from everyday posts to the odd bigger moment, kept recognisably on brand.\n\nA good part of it was Samsung Community, the brand’s own space for contests, news and conversation, where I shaped how the posts and announcements looked so it all read as one brand."
+}, {
+  id: "peugeot",
+  short: "PEUGEOT, Find Your Uniqueness",
+  img: null,
+  seamless: true,
+  label: "PEUGEOT, Find Your Uniqueness",
+  cover: "radial-gradient(60% 70% at 78% 80%,#d8463a,transparent 55%),linear-gradient(135deg,#0c0c0c,#2b2b2b)",
+  meta: "Peugeot · Print & Digital",
+  tags: ["Print", "Posters", "Newsletters"],
+  body: "For Peugeot I worked on the visual side of Private Sales, a campaign built around finding your own path and not settling for what's expected.\n\nI designed the in-store posters and their digital versions, keeping that calm, premium Peugeot feel while making the offer impossible to walk past.\n\nThe same campaign also went out as newsletters, taking Private Sales straight to the inbox."
+}, {
+  id: "mediamarkt",
+  short: "MediaMarkt",
+  img: null,
+  seamless: true,
+  label: "MediaMarkt",
+  cover: "radial-gradient(60% 60% at 28% 22%,#ff8a8a,transparent 55%),linear-gradient(135deg,#e30613,#8c0008)",
+  meta: "MediaMarkt · Print & Digital",
+  tags: ["Print", "Flyers", "Newsletters"],
+  body: "At MediaMarkt I worked on the retail side, putting together the brochures, flyers and seasonal catalogues behind the big pushes, Black Friday, Black to School, the moments that fill a store.\n\nIt was fast, price-led work, the kind where everything still has to read sharp and unmistakably MediaMarkt even when you're producing it at speed.\n\nFrom there the same campaigns moved into the digital newsletters, carrying each offer from the printed page straight to the inbox."
+}, {
+  id: "accord",
+  short: "Accord",
+  img: null,
+  seamless: true,
+  label: "Accord",
+  cover: "radial-gradient(60% 60% at 70% 30%,#f7c6e0,transparent 55%),linear-gradient(135deg,#5a4395,#a779c0)",
+  meta: "Accord · Graphic Design",
+  tags: ["Print", "Hospitality", "POS"],
+  body: "Table-top cards for the hotels, inviting guests to scan and vote in the British Travel Awards. The same layout adapted to each brand, so it still read as Novotel, ibis or TRIBE."
+}, {
+  id: "sam-print",
+  short: "Printed Materials, Samsung",
+  img: null,
+  seamless: true,
+  mediaCards: true,
+  label: "Printed Materials, Samsung",
+  cover: "radial-gradient(60% 60% at 70% 30%,#cfd6df,transparent 55%),linear-gradient(135deg,#1f2733,#3a4658)",
+  meta: "Samsung · Print & Retail",
+  tags: ["Print", "Retail", "Brochure"],
+  body: "A range of printed work I produced for Samsung across all sorts of formats and touchpoints, both in store and for the business side.\n\nThe aim throughout was to keep everything clearly on brand, easy to read and consistent with Samsung\u2019s identity, with each piece suited to its format. I worked on the layout, typography and art direction across the set."
+}];
+
+// Real project images supplied by the user (embedded). Assigned to each project.
+const PROJECT_IMG = {
+    "sam-awards": "assets/img_003.jpg",
+    "sam-print": "assets/img_004.jpg",
+    "sam-planet": "assets/img_005.jpg",
+  "sam-support": "assets/img_006.jpg",
+  "randstad": "assets/img_007.jpg",
+  "sam-cpc": "assets/img_008.jpg",
+  "sam-protect": "assets/img_009.jpg",
+  "cpc-social": "assets/img_010.jpg",
+  "mediamarkt": "assets/img_011.jpg",
+  "movistar": "assets/img_012.jpg",
+  "accord": "assets/img_013.jpg",
+  "peugeot": "assets/img_014.jpg"
+};
+PROJECTS.forEach(p => {
+  if (PROJECT_IMG[p.id]) p.img = PROJECT_IMG[p.id];
+});
+const PROJECT_MEDIA = {
+    "sam-cpc": [
+      "assets/img_015.jpg",
+      "assets/img_016.jpg",
+      "assets/img_017.jpg"
+    ],
+    "cpc-social": [
+      "assets/img_018.jpg",
+      "assets/img_019.jpg",
+      "assets/img_020.jpg",
+      "assets/img_021.jpg",
+      "assets/img_022.jpg",
+      "vgrid:yt:Lw1Zv0muqUg|yt:GfFaZXt003A|vimeo:981295234"
+    ],
+    "sam-awards": [
+      "assets/img_023.jpg",
+      "ytface:jRrEXLOR0i4"
+    ],
+    "randstad": [
+      "assets/img_024.jpg",
+      "assets/img_025.jpg",
+      "assets/img_026.jpg"
+    ],
+    "sam-print": [
+      "assets/img_027.jpg",
+      "assets/img_028.jpg",
+      "assets/img_029.jpg",
+      "assets/img_030.jpg"
+    ],
+    "sam-protect": [
+      "assets/img_031.jpg",
+      "video:WFx6U3qPYCM",
+      "duo:assets/img_001.mp4|~|assets/img_002.mp4",
+      "assets/img_032.jpg",
+      "assets/img_033.jpg",
+      "assets/img_034.jpg",
+      "assets/img_003.gif",
+      "assets/img_004.gif",
+      "assets/img_005.gif",
+      "assets/img_006.gif"
+    ],
+  "accord": ["assets/img_035.jpg", "assets/img_036.jpg", "assets/img_037.jpg"],
+  "peugeot": ["assets/img_038.jpg"],
+  "mediamarkt": ["assets/img_039.jpg"],
+  "movistar": ["assets/img_040.jpg", "assets/img_007.mp4"]
+};
+PROJECTS.forEach(p => {
+  if (PROJECT_MEDIA[p.id]) p.media = PROJECT_MEDIA[p.id];
+});
+const EUFORIA = {
+  "id": "euforia",
+  "short": "Euforia Magazine",
+  "img": null,
+  "imagesOnly": true,
+  "meta": "Editorial \u00b7 Print & Digital",
+  "tags": ["Editorial", "Print", "Magazine"],
+  "cover": "linear-gradient(135deg,#ffe600,#f4c500)",
+  "body": "Euforia is a fashion and culture magazine I put together as a personal editorial project, mostly an excuse to play with big type, bold colour and a confident grid.\n\nIt runs from the printed object all the way to phone and tablet, with a cover story, a few interviews and some photo-led spreads to set the tone.",
+  "media": ["assets/img_041.jpg", "assets/img_042.jpg", "assets/img_043.jpg"]
+};
+const CASTROL = {
+  "id": "castrol",
+  "short": "Castrol Social Media",
+  "img": "assets/img_044.jpg",
+  "imagesOnly": true,
+  "seamless": true,
+  "meta": "Social Media \u00b7 Content Design",
+  "tags": ["Social", "Content", "Automotive"],
+  "cover": "linear-gradient(135deg,#16a34a,#065f33)",
+  "media": ["assets/img_045.jpg"]
+};
+const DOPAMINE = {
+  "id": "dopamine",
+  "short": "DopamineLand",
+  "img": "assets/img_046.jpg",
+  "imagesOnly": true,
+  "meta": "Experiential \u00b7 Campaign Design",
+  "tags": ["Experiential", "OOH", "Social"],
+  "cover": "linear-gradient(135deg,#ff2d75,#7b2ff7)",
+  "media": ["assets/img_014.png", "assets/img_008.mp4", "assets/img_047.jpg"]
+};
+const TEETHTODAY = {
+  "id": "teethtoday",
+  "short": "TeethToday Social Revamp",
+  "img": "assets/img_048.jpg",
+  "imagesOnly": true,
+  "meta": "Social Media \u00b7 Brand Revamp",
+  "tags": ["Social", "Branding", "Dental"],
+  "cover": "linear-gradient(135deg,#00e676,#00bfa5)",
+  "media": ["assets/img_049.jpg"]
+};
+const BANCO = {
+  "id": "banco-espana",
+  "short": "Banco de Espa\u00f1a",
+  "img": "assets/img_050.jpg",
+  "imagesOnly": true,
+  "meta": "Awareness \u00b7 Editorial Design",
+  "tags": ["Print", "Awareness", "Institutional"],
+  "cover": "linear-gradient(135deg,#ba5744,#7a2e22)",
+  "media": ["assets/img_050.jpg", "assets/img_051.jpg"]
+};
+const BIN_PROJECTS = [EUFORIA, CASTROL, DOPAMINE, TEETHTODAY, BANCO];
+
+// w/h vary so icons read like scattered photos/covers of different sizes
+/* ===== MOBILE WALLPAPER PLACEHOLDER =====================================
+   Reemplaza el valor de MOBILE_BG cuando tengas el fondo definitivo.
+   Para una imagen:  const MOBILE_BG = 'url("assets/img_052.jpg") center/cover no-repeat';
+   (de momento es un degradado temporal)                                   */
+const MOBILE_BG = 'url("assets/img_053.jpg") center/cover no-repeat';
+const DESKTOP_LAYOUT = [{
+  id: "sam-support",
+  x: 11,
+  y: 17,
+  w: 86,
+  h: 58
+}, {
+  id: "sam-planet",
+  x: 27,
+  y: 31,
+  w: 62,
+  h: 62
+}, {
+  id: "sam-awards",
+  x: 15,
+  y: 54,
+  w: 54,
+  h: 74
+}, {
+  id: "randstad",
+  x: 39,
+  y: 18,
+  w: 72,
+  h: 50
+}, {
+  id: "movistar",
+  x: 51,
+  y: 38,
+  w: 58,
+  h: 58
+}, {
+  id: "sam-cpc",
+  x: 65,
+  y: 21,
+  w: 78,
+  h: 52
+}, {
+  id: "sam-protect",
+  x: 80,
+  y: 33,
+  w: 66,
+  h: 96
+}, {
+  id: "cpc-social",
+  x: 32,
+  y: 67,
+  w: 68,
+  h: 68
+}, {
+  id: "peugeot",
+  x: 88,
+  y: 58,
+  w: 84,
+  h: 54
+}, {
+  id: "mediamarkt",
+  x: 57,
+  y: 62,
+  w: 58,
+  h: 72
+}, {
+  id: "accord",
+  x: 74,
+  y: 72,
+  w: 62,
+  h: 78
+}, {
+  id: "sam-print",
+  x: 45,
+  y: 49,
+  w: 66,
+  h: 66
+}];
+
+/* Layout SOLO móvil: mismas tarjetas pero desplazadas a la derecha para que
+   ningún icono quede tapado por la barra lateral izquierda. */
+const DESKTOP_LAYOUT_MOBILE = [{
+  id: "sam-support",
+  x: 32,
+  y: 17,
+  w: 86,
+  h: 58
+}, {
+  id: "sam-planet",
+  x: 44,
+  y: 31,
+  w: 62,
+  h: 62
+}, {
+  id: "sam-awards",
+  x: 35,
+  y: 54,
+  w: 54,
+  h: 74
+}, {
+  id: "randstad",
+  x: 52,
+  y: 18,
+  w: 72,
+  h: 50
+}, {
+  id: "movistar",
+  x: 61,
+  y: 38,
+  w: 58,
+  h: 58
+}, {
+  id: "sam-cpc",
+  x: 71,
+  y: 21,
+  w: 78,
+  h: 52
+}, {
+  id: "sam-protect",
+  x: 82,
+  y: 33,
+  w: 66,
+  h: 96
+}, {
+  id: "cpc-social",
+  x: 47,
+  y: 67,
+  w: 68,
+  h: 68
+}, {
+  id: "peugeot",
+  x: 88,
+  y: 58,
+  w: 84,
+  h: 54
+}, {
+  id: "mediamarkt",
+  x: 66,
+  y: 62,
+  w: 58,
+  h: 72
+}, {
+  id: "accord",
+  x: 78,
+  y: 72,
+  w: 62,
+  h: 78
+}, {
+  id: "sam-print",
+  x: 60,
+  y: 49,
+  w: 66,
+  h: 66
+}];
+const IS_MOBILE = typeof window !== "undefined" && window.innerWidth <= 768;
+const LAYOUT = IS_MOBILE ? DESKTOP_LAYOUT_MOBILE : DESKTOP_LAYOUT;
+
+/* ---------- COVER-ART THUMBNAIL ------------------------------------------ */
+
+function CoverThumb({
+  project,
+  w = 64,
+  h = 64,
+  radius = 7
+}) {
+  const src = project.img || project.media && project.media[0];
+  if (src) {
+    const box = Math.max(w, h);
+    return /*#__PURE__*/React.createElement("img", {
+      className: "thumb-img",
+      src: src,
+      alt: project.short,
+      draggable: false,
+      style: {
+        maxWidth: box,
+        maxHeight: box,
+        borderRadius: radius
+      }
+    });
+  }
+  const style = {
+    width: w,
+    height: h,
+    borderRadius: radius
+  };
+  return /*#__PURE__*/React.createElement("span", {
+    className: "thumb cover",
+    style: {
+      ...style,
+      background: project.cover
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "cover-grain"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "cover-vignette"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "cover-frame"
+  }));
+}
+
+/* ---------- DESKTOP ICON -------------------------------------------------- */
+
+function DesktopIcon({
+  project,
+  pos,
+  onMove,
+  onOpen
+}) {
+  const drag = useRef(null);
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const onPointerDown = e => {
+    const cx = pos.x / 100 * window.innerWidth;
+    const cy = pos.y / 100 * window.innerHeight;
+    drag.current = {
+      offX: e.clientX - cx,
+      offY: e.clientY - cy,
+      sx: e.clientX,
+      sy: e.clientY,
+      moved: false
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const onPointerMove = e => {
+    if (!drag.current) return;
+    if (!drag.current.moved && Math.hypot(e.clientX - drag.current.sx, e.clientY - drag.current.sy) < 5) return;
+    drag.current.moved = true;
+    const nx = clamp((e.clientX - drag.current.offX) / window.innerWidth * 100, 3, 97);
+    const ny = clamp((e.clientY - drag.current.offY) / window.innerHeight * 100, 4, 90);
+    onMove(project.id, nx, ny);
+  };
+  const onPointerUp = e => {
+    const wasDrag = drag.current && drag.current.moved;
+    drag.current = null;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {}
+    if (!wasDrag) onOpen(project);
+  };
+  return /*#__PURE__*/React.createElement("button", {
+    className: "desk-icon",
+    style: {
+      left: `${pos.x}%`,
+      top: `${pos.y}%`
+    },
+    onPointerDown: onPointerDown,
+    onPointerMove: onPointerMove,
+    onPointerUp: onPointerUp
+  }, /*#__PURE__*/React.createElement(CoverThumb, {
+    project: project,
+    w: pos.w,
+    h: pos.h
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "desk-label"
+  }, project.short));
+}
+
+/* ---------- WINDOW CONTENT ------------------------------------------------ */
+
+function YouTubeEmbed({
+  id,
+  title,
+  vertical
+}) {
+  const [play, setPlay] = useState(false);
+  const watch = `https://www.youtube.com/watch?v=${id}`;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "yt-wrap"
+  }, play ? /*#__PURE__*/React.createElement("div", {
+    className: "info-video" + (vertical ? " vertical" : "")
+  }, /*#__PURE__*/React.createElement("iframe", {
+    src: `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1`,
+    title: title,
+    frameBorder: "0",
+    allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+    allowFullScreen: true
+  })) : /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "info-video info-video-facade" + (vertical ? " vertical" : ""),
+    onClick: () => setPlay(true),
+    "aria-label": "Play video: " + title,
+    style: {
+      backgroundImage: `url(https://img.youtube.com/vi/${id}/hqdefault.jpg)`
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "yt-play"
+  }, /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M8 5v14l11-7z"
+  })))), /*#__PURE__*/React.createElement("a", {
+    className: "yt-link",
+    href: watch,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, "Watch on YouTube \u2197"));
+}
+function ProjectContent({
+  project
+}) {
+  const thumbSrc = project.img || project.media && project.media[0];
+  const thumbStyle = thumbSrc ? {
+    backgroundImage: `url(${thumbSrc})`
+  } : {
+    background: project.cover
+  };
+  if (project.imagesOnly && project.media) {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "info-doc"
+    }, project.seamless ? /*#__PURE__*/React.createElement("div", {
+      className: "info-media" + (project.mediaCards ? " info-media-cards" : "") + (project.mediaPad ? " info-media-pad" : "") + (project.mediaFlush ? " info-media-flush" : ""), style: project.mediaBg ? { background: project.mediaBg } : undefined
+    }, project.media.map((src, i) => mediaNode(src, i, "info-media-img", project.short + " " + (i + 1)))) : /*#__PURE__*/React.createElement("div", {
+      className: "info-gallery"
+    }, project.media.map((src, i) => mediaNode(src, i, "info-preview-img info-gallery-img", project.short + " " + (i + 1)))));
+  }
+  return /*#__PURE__*/React.createElement("div", {
+    className: "info-doc"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "info-head"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "info-icon",
+    style: thumbStyle
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "info-head-text"
+  }, /*#__PURE__*/React.createElement("h1", {
+    className: "info-name"
+  }, project.short), /*#__PURE__*/React.createElement("p", {
+    className: "info-sub"
+  }, project.meta))), /*#__PURE__*/React.createElement("div", {
+    className: "info-desc"
+  }, project.body.split(/\n+/).filter(Boolean).map((para, i) => /*#__PURE__*/React.createElement("p", {
+    key: i
+  }, para))), /*#__PURE__*/React.createElement("details", {
+    className: "info-section",
+    open: true
+  }, /*#__PURE__*/React.createElement("summary", {
+    className: "info-summary"
+  }, (project.videos && project.videos.length > 1 ? "Videos:" : (project.videos || project.video) ? "Video:" : "Preview:")), /*#__PURE__*/React.createElement("div", {
+    className: "info-preview"
+  }, (project.videos || project.video) ? /*#__PURE__*/React.createElement("div", {
+    className: "info-videos"
+  }, (project.videos || [project.video]).map((vid, vi) => /*#__PURE__*/React.createElement(YouTubeEmbed, {
+    key: vi,
+    id: typeof vid === "string" ? vid : vid.id,
+    title: project.short,
+    vertical: typeof vid === "object" && vid.vertical
+  }))) : project.media ? project.seamless ? /*#__PURE__*/React.createElement("div", {
+    className: "info-media" + (project.mediaCards ? " info-media-cards" : "") + (project.mediaPad ? " info-media-pad" : "") + (project.mediaFlush ? " info-media-flush" : ""), style: project.mediaBg ? { background: project.mediaBg } : undefined
+  }, project.media.map((src, i) => mediaNode(src, i, "info-media-img", project.short + " " + (i + 1)))) : /*#__PURE__*/React.createElement("div", {
+    className: "info-gallery"
+  }, project.media.map((src, i) => mediaNode(src, i, "info-preview-img info-gallery-img", project.short + " " + (i + 1)))) : project.img ? /*#__PURE__*/React.createElement("img", {
+    className: "info-preview-img",
+    src: project.img,
+    alt: project.short,
+    draggable: false
+  }) : /*#__PURE__*/React.createElement("div", {
+    className: "info-preview-grad",
+    style: {
+      background: project.cover
+    }
+  }))));
+}
+function AboutContent() {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "about-doc"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "about-eyebrow"
+  }, "About"), /*#__PURE__*/React.createElement("h1", {
+    className: "about-h1"
+  }, "Making things feel alive."), /*#__PURE__*/React.createElement("p", {
+    className: "about-lead"
+  }, "I'm Ivan, a designer who never really stopped tinkering."), /*#__PURE__*/React.createElement("p", {
+    className: "about-p"
+  }, "I started out completely self-taught, too impatient to wait for anyone to show me how. Before I had any job in this, I was making things purely for the love of it, 3D scenes in Cinema 4D, custom brushes, typefaces, photo presets, and giving them away for free, just to put them out into the world."), /*#__PURE__*/React.createElement("p", {
+    className: "about-p"
+  }, "Later I went and studied design properly, but that self-taught reflex stuck: if I can't do something yet, I go learn it. So I can take an idea from a blank page all the way to a finished piece on my own, and also make it actually happen inside a big company, with teams, deadlines and a hundred moving parts pulling in different directions."), /*#__PURE__*/React.createElement("p", {
+    className: "about-p"
+  }, "Ten-plus years later I've directed and built work for brands like Samsung, MediaMarkt, Randstad or Movistar. But what I care about hasn't changed since those Photoshop custom brushes, making things with a bit of soul, that stick with people a little longer than they expected."), /*#__PURE__*/React.createElement("p", {
+    className: "about-p about-closing"
+  }, "Away from the screen, you'll usually find me surfing, lost in a classic novel, or hunting down the next film worth recommending."));
+}
+
+/* ---------- CONTACT (copy + form + sketch) ------------------------------- */
+
+function SketchPad({
+  canvasRef
+}) {
+  const drawing = useRef(false);
+  const rectRef = useRef(null);
+  const borderRef = useRef({ bl: 0, bt: 0 });
+  const last = useRef({
+    x: 0,
+    y: 0
+  });
+  const [tool, setTool] = useState("pen");
+  const toolRef = useRef("pen");
+  useEffect(() => {
+    toolRef.current = tool;
+  }, [tool]);
+  useEffect(() => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext("2d");
+    const setup = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const cw = c.clientWidth;
+      const ch = c.clientHeight;
+      if (!cw || !ch) return;
+      const w = Math.round(cw * dpr);
+      const h = Math.round(ch * dpr);
+      const changed = c.width !== w || c.height !== h;
+      if (changed) {
+        c.width = w;
+        c.height = h;
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (changed) {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, cw, ch);
+      }
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.lineWidth = 2.4;
+      ctx.strokeStyle = "#111111";
+      const cs = window.getComputedStyle(c);
+      borderRef.current = {
+        bl: parseFloat(cs.borderLeftWidth) || 0,
+        bt: parseFloat(cs.borderTopWidth) || 0
+      };
+    };
+    setup();
+    let ro = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(setup);
+      ro.observe(c);
+    }
+    return () => {
+      if (ro) ro.disconnect();
+    };
+  }, [canvasRef]);
+  const pos = e => {
+    let o = rectRef.current;
+    if (!o) {
+      const r = canvasRef.current.getBoundingClientRect();
+      const b = borderRef.current;
+      o = {
+        ox: r.left + b.bl,
+        oy: r.top + b.bt
+      };
+    }
+    return {
+      x: e.clientX - o.ox,
+      y: e.clientY - o.oy
+    };
+  };
+  const polyStar = (ctx, cx, cy, spikes, outer, inner) => {
+    ctx.beginPath();
+    for (let i = 0; i < spikes * 2; i++) {
+      const r = i % 2 === 0 ? outer : inner;
+      const a = Math.PI / spikes * i - Math.PI / 2;
+      const x = cx + Math.cos(a) * r,
+        y = cy + Math.sin(a) * r;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+  };
+  const drawStamp = (kind, x, y) => {
+    const ctx = canvasRef.current.getContext("2d");
+    ctx.save();
+    ctx.fillStyle = "#111111";
+    ctx.strokeStyle = "#111111";
+    ctx.lineWidth = 2.6;
+    const s = 15;
+    if (kind === "circle") {
+      ctx.beginPath();
+      ctx.arc(x, y, s, 0, Math.PI * 2);
+      ctx.stroke();
+    } else if (kind === "star") {
+      polyStar(ctx, x, y, 5, s, s * 0.45);
+      ctx.fill();
+    } else if (kind === "spark") {
+      ctx.beginPath();
+      ctx.moveTo(x, y - s);
+      ctx.quadraticCurveTo(x + s * 0.18, y - s * 0.18, x + s, y);
+      ctx.quadraticCurveTo(x + s * 0.18, y + s * 0.18, x, y + s);
+      ctx.quadraticCurveTo(x - s * 0.18, y + s * 0.18, x - s, y);
+      ctx.quadraticCurveTo(x - s * 0.18, y - s * 0.18, x, y - s);
+      ctx.closePath();
+      ctx.fill();
+    } else if (kind === "heart") {
+      ctx.beginPath();
+      ctx.moveTo(x, y + s * 0.7);
+      ctx.bezierCurveTo(x + s * 1.2, y - s * 0.4, x + s * 0.4, y - s * 1.05, x, y - s * 0.35);
+      ctx.bezierCurveTo(x - s * 0.4, y - s * 1.05, x - s * 1.2, y - s * 0.4, x, y + s * 0.7);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  };
+  const start = e => {
+    const c = canvasRef.current;
+    const r = c.getBoundingClientRect();
+    const b = borderRef.current;
+    rectRef.current = {
+      ox: r.left + b.bl,
+      oy: r.top + b.bt
+    };
+    try {
+      c.setPointerCapture(e.pointerId);
+    } catch (err) {}
+    const p = pos(e);
+    if (toolRef.current === "pen") {
+      drawing.current = true;
+      last.current = p;
+      const ctx = c.getContext("2d");
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.lineTo(p.x + 0.01, p.y + 0.01);
+      ctx.stroke();
+    } else {
+      drawStamp(toolRef.current, p.x, p.y);
+    }
+  };
+  const move = e => {
+    if (!drawing.current || toolRef.current !== "pen") return;
+    e.preventDefault();
+    const ctx = canvasRef.current.getContext("2d");
+    const ne = e.nativeEvent || e;
+    const evs = ne.getCoalescedEvents ? ne.getCoalescedEvents() : [ne];
+    ctx.beginPath();
+    ctx.moveTo(last.current.x, last.current.y);
+    for (let k = 0; k < evs.length; k++) {
+      const p = pos(evs[k]);
+      ctx.lineTo(p.x, p.y);
+      last.current = p;
+    }
+    ctx.stroke();
+  };
+  const end = e => {
+    drawing.current = false;
+    try {
+      if (e && e.pointerId != null) canvasRef.current.releasePointerCapture(e.pointerId);
+    } catch (err) {}
+  };
+  const clear = () => {
+    const c = canvasRef.current;
+    const ctx = c.getContext("2d");
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.restore();
+  };
+  const stamps = [{
+    id: "star",
+    node: /*#__PURE__*/React.createElement("svg", {
+      viewBox: "0 0 20 20"
+    }, /*#__PURE__*/React.createElement("path", {
+      d: "M10 1 L12.4 7.2 L19 7.6 L13.8 11.8 L15.6 18.2 L10 14.4 L4.4 18.2 L6.2 11.8 L1 7.6 L7.6 7.2 Z",
+      fill: "currentColor"
+    }))
+  }, {
+    id: "heart",
+    node: /*#__PURE__*/React.createElement("svg", {
+      viewBox: "0 0 20 20"
+    }, /*#__PURE__*/React.createElement("path", {
+      d: "M10 17 C2 11 3 4 7 4 C9 4 10 6 10 6 C10 6 11 4 13 4 C17 4 18 11 10 17 Z",
+      fill: "currentColor"
+    }))
+  }, {
+    id: "circle",
+    node: /*#__PURE__*/React.createElement("svg", {
+      viewBox: "0 0 20 20"
+    }, /*#__PURE__*/React.createElement("circle", {
+      cx: "10",
+      cy: "10",
+      r: "7",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: "2.2"
+    }))
+  }, {
+    id: "spark",
+    node: /*#__PURE__*/React.createElement("svg", {
+      viewBox: "0 0 20 20"
+    }, /*#__PURE__*/React.createElement("path", {
+      d: "M10 1 C11 6.5 13.5 9 19 10 C13.5 11 11 13.5 10 19 C9 13.5 6.5 11 1 10 C6.5 9 9 6.5 10 1 Z",
+      fill: "currentColor"
+    }))
+  }];
+  return /*#__PURE__*/React.createElement("div", {
+    className: "sketch-block"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "sketch-head"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "field-label"
+  }, "Sketchpad"), /*#__PURE__*/React.createElement("div", {
+    className: "sketch-tools"
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "tool-btn" + (tool === "pen" ? " active" : ""),
+    onClick: () => setTool("pen"),
+    title: "Draw"
+  }, /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 20 20"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M3 17 L4 13 L13.5 3.5 L16.5 6.5 L7 16 Z",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.6",
+    strokeLinejoin: "round"
+  }))), stamps.map(s => /*#__PURE__*/React.createElement("button", {
+    key: s.id,
+    type: "button",
+    className: "tool-btn" + (tool === s.id ? " active" : ""),
+    onClick: () => setTool(s.id),
+    title: "Stamp " + s.id
+  }, s.node)), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "sketch-clear",
+    onClick: clear
+  }, "Clear"))), /*#__PURE__*/React.createElement("canvas", {
+    ref: canvasRef,
+    className: "sketch-canvas",
+    style: {
+      cursor: tool === "pen" ? "crosshair" : "copy",
+      touchAction: "none"
+    },
+    onPointerDown: start,
+    onPointerMove: move,
+    onPointerUp: end,
+    onPointerCancel: end
+  }));
+}
+function ContactContent() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [project, setProject] = useState("");
+  const [includeDoodle, setIncludeDoodle] = useState(true);
+  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
+  const canvasRef = useRef(null);
+  const clearCanvas = () => {
+    const c = canvasRef.current;
+    if (!c) return;
+    const ctx = c.getContext("2d");
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.restore();
+  };
+  const submit = async () => {
+    if (!name.trim() || !email.trim()) {
+      setStatus("invalid");
+      return;
+    }
+    setStatus("sending");
+    try {
+      const fd = new FormData();
+      fd.append("form-name", "contact");
+      fd.append("bot-field", "");
+      fd.append("name", name);
+      fd.append("email", email);
+      fd.append("project", project.trim() || "(not specified)");
+      if (includeDoodle && canvasRef.current) {
+        const blob = await new Promise(function (res) { canvasRef.current.toBlob(res, "image/png"); });
+        if (blob) fd.append("doodle", new File([blob], "doodle-" + Date.now() + ".png", { type: "image/png" }));
+      }
+      const resp = await fetch("/", { method: "POST", body: fd });
+      if (!resp.ok) throw new Error("status " + resp.status);
+      setStatus("sent");
+    } catch (err) {
+      setStatus("error");
+    }
+  };
+  const invalid = status === "invalid";
+  return /*#__PURE__*/React.createElement("div", {
+    className: "contact-doc"
+  }, /*#__PURE__*/React.createElement("h1", {
+    className: "contact-h1"
+  }, "Let's work together."), /*#__PURE__*/React.createElement("p", {
+    className: "contact-lead"
+  }, "If you have a project, a brief, or a brand that needs strong creative direction, I'd like to hear about it."), /*#__PURE__*/React.createElement("p", {
+    className: "contact-sub"
+  }, "This space is also yours. Feel free to leave a small sketch alongside your message."), /*#__PURE__*/React.createElement(SketchPad, {
+    canvasRef: canvasRef
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "form"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "field"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "field-label"
+  }, "Your name ", /*#__PURE__*/React.createElement("span", {
+    className: "req"
+  }, "*")), /*#__PURE__*/React.createElement("input", {
+    className: "field-input" + (invalid && !name.trim() ? " field-err" : ""),
+    placeholder: "Who are you?",
+    value: name,
+    onChange: e => setName(e.target.value)
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "field"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "field-label"
+  }, "Email ", /*#__PURE__*/React.createElement("span", {
+    className: "req"
+  }, "*")), /*#__PURE__*/React.createElement("input", {
+    className: "field-input" + (invalid && !email.trim() ? " field-err" : ""),
+    placeholder: "your@email.com",
+    value: email,
+    onChange: e => setEmail(e.target.value)
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "field"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "field-label"
+  }, "Your project or idea"), /*#__PURE__*/React.createElement("textarea", {
+    className: "field-input field-area",
+    rows: 3,
+    placeholder: "Tell me what you're working on\u2026",
+    value: project,
+    onChange: e => setProject(e.target.value)
+  })), /*#__PURE__*/React.createElement("label", {
+    className: "checkbox-row"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: includeDoodle,
+    onChange: e => setIncludeDoodle(e.target.checked)
+  }), /*#__PURE__*/React.createElement("span", null, "Include my doodle with this message")), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "primary-btn",
+    onClick: submit,
+    disabled: status === "sending"
+  }, status === "sending" ? "Sending\u2026" : status === "sent" ? "Sent \u2713" : "Get in touch"), invalid && /*#__PURE__*/React.createElement("p", {
+    className: "form-note err"
+  }, "Please add your name and email so I can reply."), status === "sent" && /*#__PURE__*/React.createElement("p", { className: "form-note ok" }, "Thanks! Your message is on its way, doodle included. I\u2019ll reply soon."), status === "error" && /*#__PURE__*/React.createElement("p", { className: "form-note err" }, "Something went wrong. Please email me directly at tejadarobles@gmail.com.")), /*#__PURE__*/React.createElement("div", {
+    className: "contact-outro"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "contact-outro-text"
+  }, "Prefer LinkedIn?"), /*#__PURE__*/React.createElement("a", {
+    className: "linkedin-btn",
+    href: "https://www.linkedin.com/in/ivantejadarobles/",
+    target: "_blank",
+    rel: "noreferrer"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "li-badge"
+  }, "in"), /*#__PURE__*/React.createElement("span", null, "Connect on LinkedIn"))));
+}
+function WorkContent({
+  onOpen
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "work-grid-wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "work-grid"
+  }, PROJECTS.map(p => /*#__PURE__*/React.createElement("button", {
+    key: p.id,
+    className: "work-item",
+    onClick: () => onOpen(p)
+  }, /*#__PURE__*/React.createElement(CoverThumb, {
+    project: p,
+    w: 132,
+    h: 132,
+    radius: 12
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "work-label"
+  }, p.short)))));
+}
+function CVContent() {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "cv-doc"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "cv-page"
+  }, /*#__PURE__*/React.createElement("h1", {
+    className: "cv-name"
+  }, "IVAN TEJADA"), /*#__PURE__*/React.createElement("p", {
+    className: "cv-sub"
+  }, "Creative Lead \xB7 10+ years \xB7 Madrid"), /*#__PURE__*/React.createElement("p", {
+    className: "cv-contact"
+  }, "tejadarobles@gmail.com \xB7 (+34) 603 570 471 \xB7 linkedin.com/in/ivantejadarobles"), /*#__PURE__*/React.createElement("hr", null), /*#__PURE__*/React.createElement("h3", null, "Experience"), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("b", null, "Accenture"), ", 2019 \u2192 Present (promoted twice)"), /*#__PURE__*/React.createElement("p", {
+    className: "cv-dim"
+  }, "Creative Lead & Creative Operations Manager \xB7 Senior Visual Designer \xB7 Media & Graphics Design Analyst"), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("b", null, "Megamusic"), ", Graphic Design & Digital Marketing (2017\u20132018)"), /*#__PURE__*/React.createElement("p", null, /*#__PURE__*/React.createElement("b", null, "Freelance"), ", Graphic Design (2013\u20132016)"), /*#__PURE__*/React.createElement("h3", null, "Education"), /*#__PURE__*/React.createElement("p", null, "Design & Digital Creation, UOC (2019\u20132023) \xB7 Marketing of Tourism Services, UNED (2013\u20132019)"), /*#__PURE__*/React.createElement("h3", null, "Skills"), /*#__PURE__*/React.createElement("p", null, "Strategic Planning \xB7 Creative Direction \xB7 Project Management \xB7 Team Leadership \xB7 Adobe Creative Suite \xB7 AEM \xB7 Synthesia \xB7 Adobe Firefly \xB7 Midjourney \xB7 Jira"), /*#__PURE__*/React.createElement("h3", null, "Languages"), /*#__PURE__*/React.createElement("p", null, "Spanish (native) \xB7 English (full professional) \xB7 Italian (A2)")), /*#__PURE__*/React.createElement("a", {
+    className: "cv-download",
+    href: CV_PDF,
+    download: "Ivan_Tejada_CV_EN.pdf"
+  }, "\u2B07 Download PDF"));
+}
+function AboutWindow() {
+  const [tab, setTab] = useState("about");
+  return /*#__PURE__*/React.createElement("div", {
+    className: "aboutwin"
+  }, /*#__PURE__*/React.createElement("aside", {
+    className: "aboutwin-side"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "aboutwin-side-title"
+  }, "Sections"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "aboutwin-tab" + (tab === "about" ? " active" : ""),
+    onClick: () => setTab("about")
+  }, "About me"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "aboutwin-tab" + (tab === "cv" ? " active" : ""),
+    onClick: () => setTab("cv")
+  }, "CV")), /*#__PURE__*/React.createElement("div", {
+    className: "aboutwin-main"
+  }, tab === "about" ? /*#__PURE__*/React.createElement(AboutContent, null) : /*#__PURE__*/React.createElement(CVContent, null)));
+}
+function ErrorContent({
+  onClose
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "error-dialog"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "error-badge"
+  }, "\u26A0\uFE0F"), /*#__PURE__*/React.createElement("h2", {
+    className: "error-title"
+  }, "ERROR_418 \xB7 Creativity overflow"), /*#__PURE__*/React.createElement("p", {
+    className: "error-body"
+  }, "Too many ideas, not enough hours in the day. This button does absolutely nothing, and it does it beautifully. \u2726"), /*#__PURE__*/React.createElement("button", {
+    className: "error-ok",
+    onClick: onClose
+  }, "OK, fair enough"));
+}
+function MindContent({
+  title,
+  paras
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "about-doc"
+  }, /*#__PURE__*/React.createElement("h1", {
+    className: "about-h1 mind-h1"
+  }, title), paras.map((t, i) => /*#__PURE__*/React.createElement("p", {
+    key: i,
+    className: "about-mind" + (i === 0 ? " first" : "")
+  }, t)));
+}
+const MINDS = {
+  adobe: {
+    title: "Creative Mind",
+    paras: ["Design has always been the fun part.", "I think in images before words. Hand me a half-formed idea and I'll start sketching, moving things around, breaking them apart until they land on a shape that feels right. Graphic design, illustration, motion, to me it's all the same instinct, I don't really separate them.", "Some days that's obsessing over a single frame; other days it's stepping right back to make sure the whole thing still tells one clear story. I like both ends of it. What I'm really chasing is work with a point of view, the kind that feels like a decision and not an accident."]
+  },
+  atlassian: {
+    title: "Structure Mind",
+    paras: ["Ideas are easy. Landing them is the hard part.", "Over the years I've learned how to walk a good idea all the way to launch, through feedback rounds, timelines, budgets, a dozen markets and as many languages, without letting it lose whatever made it good in the first place.", "That means leading teams, making the calls, keeping everyone rowing in the same direction, and being the last pair of eyes before anything ships. Honestly, I enjoy it: taking a messy, tangled brief and turning it into something clear that a team can actually run with."]
+  },
+  intel: {
+    title: "Exploration Mind",
+    paras: ["I'd rather play with the new tools than be scared of them.", "I bring AI into my work the same way I taught myself everything else, by poking at it until it becomes genuinely useful. Runway, Firefly, Synthesia, Midjourney: they help me explore faster, skip the repetitive grind, and try ten directions before lunch.", "But it's a tool, not the author. The taste, the decisions and the final call stay mine. AI gets me to the good ideas quicker, it doesn't get to make them for me."]
+  }
+};
+function playMuted(el) {
+  if (!el) return;
+  el.muted = true;
+  el.defaultMuted = true;
+  var p = el.play();
+  if (p && p.catch) p.catch(function () {});
+}
+function mediaNode(src, i, imgClass, alt) {
+  if (typeof src === "string" && src.indexOf("video:") === 0) {
+    return /*#__PURE__*/React.createElement("div", { key: i, className: "info-video vertical" }, /*#__PURE__*/React.createElement("iframe", {
+      src: "https://www.youtube.com/embed/" + src.slice(6) + "?rel=0&playsinline=1",
+      title: alt,
+      frameBorder: "0",
+      allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+      allowFullScreen: true
+    }));
+  }
+  if (typeof src === "string" && src.indexOf("ytface:") === 0) {
+    return /*#__PURE__*/React.createElement(YouTubeEmbed, { key: i, id: src.slice(7), title: alt, vertical: true });
+  }
+  if (typeof src === "string" && src.indexOf("vgrid:") === 0) {
+    var vgSpecs = src.slice(6).split("|");
+    return /*#__PURE__*/React.createElement("div", { key: i, className: "info-vgrid" }, /*#__PURE__*/React.createElement("div", { className: "vg-inner" }, vgSpecs.map(function (sp, j) {
+      var c = sp.indexOf(":");
+      var prov = sp.slice(0, c), vid = sp.slice(c + 1);
+      var url = prov === "vimeo" ? "https://player.vimeo.com/video/" + vid : "https://www.youtube.com/embed/" + vid + "?rel=0&playsinline=1";
+      return /*#__PURE__*/React.createElement("div", { key: j, className: "vg-item" }, /*#__PURE__*/React.createElement("iframe", {
+        src: url,
+        title: alt + " " + (j + 1),
+        frameBorder: "0",
+        allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+        allowFullScreen: true
+      }));
+    })));
+  }
+  if (typeof src === "string" && (src.indexOf("data:video/") === 0 || src.slice(-4) === ".mp4")) {
+    return /*#__PURE__*/React.createElement("video", { key: i, className: imgClass, src: src, autoPlay: true, loop: true, muted: true, playsInline: true, preload: "auto", ref: playMuted, draggable: false });
+  }
+  if (src === "gap") {
+    return /*#__PURE__*/React.createElement("div", { key: i, className: "info-gap" });
+  }
+  if (typeof src === "string" && src.indexOf("duo:") === 0) {
+    var parts = src.slice(4).split("|~|");
+    return /*#__PURE__*/React.createElement("div", { key: i, className: "info-duo" }, parts.map(function (u, j) {
+      if (u.indexOf("data:video/") === 0 || u.slice(-4) === ".mp4") {
+        return /*#__PURE__*/React.createElement("video", { key: j, className: "info-duo-img", src: u, autoPlay: true, loop: true, muted: true, playsInline: true, preload: "auto", ref: playMuted, draggable: false });
+      }
+      return /*#__PURE__*/React.createElement("img", { key: j, className: "info-duo-img", src: u, alt: alt + " preview " + (j + 1), draggable: false });
+    }));
+  }
+  return /*#__PURE__*/React.createElement("img", { key: i, className: imgClass, src: src, alt: alt, draggable: false });
+}
+function BinContent({
+  onOpen
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "work-grid-wrap"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "bin-note"
+  }, "A drawer of smaller projects and side work. \u2726"), /*#__PURE__*/React.createElement("div", {
+    className: "work-grid"
+  }, BIN_PROJECTS.map(p => /*#__PURE__*/React.createElement("button", {
+    key: p.id,
+    className: "work-item",
+    onClick: () => onOpen(p)
+  }, /*#__PURE__*/React.createElement(CoverThumb, {
+    project: p,
+    w: 110,
+    h: 110,
+    radius: 12
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "work-label"
+  }, p.short)))));
+}
+
+/* ---------- WINDOW FRAME -------------------------------------------------- */
+
+const SMUDGE_IMG = "assets/img_054.jpg";
+const SMUDGE_ABR = "assets/Smudge.abr";
+const CLOUD_IMG = "assets/img_055.jpg";
+const CLOUD_ABR = "assets/Ivan_Tejada_Cloud_Brushes.abr";
+const ROYAL_IMG = "assets/img_056.jpg";
+const ROYAL_TTF = "assets/RoyalMarigold.ttf";
+const FREEBIES = [{
+  img: ROYAL_IMG,
+  title: "Royal Marigold",
+  desc: "An elegant display serif for headlines, posters and anything that deserves a bit of drama.",
+  file: ROYAL_TTF,
+  name: "RoyalMarigold.ttf",
+  label: "Download .ttf"
+}, {
+  img: MATPACK_IMG,
+  title: "Cinema 4D Material Pack",
+  desc: "A pack of my favourite Cinema 4D materials, ready to drop into your scene.",
+  file: C4D_MATPACK,
+  name: "IvanTejada-C4D_matpack.c4d",
+  label: "Download .c4d"
+}, {
+  img: SMUDGE_IMG,
+  title: "Smudge Brushes",
+  desc: "Gritty smudge brushes for Photoshop, ink, grime and rough edges.",
+  file: SMUDGE_ABR,
+  name: "Smudge.abr",
+  label: "Download .abr"
+}, {
+  img: CLOUD_IMG,
+  title: "Cloud Brushes",
+  desc: "Soft cloud brushes for Photoshop, skies, haze and dreamy atmosphere.",
+  file: CLOUD_ABR,
+  name: "Ivan_Tejada_Cloud_Brushes.abr",
+  label: "Download .abr"
+}];
+function FreeStuff() {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "free-doc"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "bin-note"
+  }, "I made these and I'm giving them away. For free. Not the 'drop your email first' kind of free, actually free. Take whatever you want. \u2726"), FREEBIES.map((f, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "free-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "free-thumb",
+    style: { backgroundImage: `url(${f.img})` }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "free-info"
+  }, /*#__PURE__*/React.createElement("h3", {
+    className: "free-title"
+  }, f.title), /*#__PURE__*/React.createElement("p", {
+    className: "free-desc"
+  }, f.desc), /*#__PURE__*/React.createElement("a", {
+    className: "free-dl",
+    href: f.file,
+    download: f.name
+  }, "\u2B07 " + f.label)))));
+}
+
+const ILLUSTRATIONS = [];
+function ArtContent() {
+  const note = "Personal work I draw for fun, no brief and no client behind it. Just illustrations and little animations I make because I feel like it.";
+  return /*#__PURE__*/React.createElement("div", {
+    className: "free-doc"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "bin-note"
+  }, ILLUSTRATIONS.length ? note : note + " More landing here soon. \u270E"), ILLUSTRATIONS.length ? /*#__PURE__*/React.createElement("div", {
+    className: "art-grid"
+  }, ILLUSTRATIONS.map((it, i) => /*#__PURE__*/React.createElement("figure", {
+    key: i,
+    className: "art-item"
+  }, it.video ? /*#__PURE__*/React.createElement("video", {
+    src: it.video,
+    autoPlay: true,
+    loop: true,
+    muted: true,
+    playsInline: true,
+    draggable: false
+  }) : /*#__PURE__*/React.createElement("img", {
+    src: it.img,
+    alt: it.title || "Illustration " + (i + 1),
+    loading: "lazy",
+    draggable: false
+  }), it.title ? /*#__PURE__*/React.createElement("figcaption", {
+    className: "art-cap"
+  }, it.title) : null))) : null);
+}
+
+function FolderWindow({
+  onOpen
+}) {
+  const [tab, setTab] = useState("projects");
+  return /*#__PURE__*/React.createElement("div", {
+    className: "aboutwin"
+  }, /*#__PURE__*/React.createElement("aside", {
+    className: "aboutwin-side"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "aboutwin-side-title"
+  }, "Folder"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "aboutwin-tab" + (tab === "projects" ? " active" : ""),
+    onClick: () => setTab("projects")
+  }, "Projects"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "aboutwin-tab" + (tab === "art" ? " active" : ""),
+    onClick: () => setTab("art")
+  }, "Doodles"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "aboutwin-tab" + (tab === "free" ? " active" : ""),
+    onClick: () => setTab("free")
+  }, "Free Stuff")), /*#__PURE__*/React.createElement("div", {
+    className: "aboutwin-main"
+  }, tab === "projects" ? /*#__PURE__*/React.createElement(BinContent, {
+    onOpen: onOpen
+  }) : tab === "art" ? /*#__PURE__*/React.createElement(ArtContent, null) : /*#__PURE__*/React.createElement(FreeStuff, null)));
+}
+function WindowFrame({
+  win,
+  focused,
+  onFocus,
+  onClose,
+  onMinimize,
+  onMaximize,
+  onDrag,
+  onResize,
+  children
+}) {
+  const dragging = useRef(null);
+  const resizing = useRef(null);
+  const onPointerDown = e => {
+    if (e.target.closest(".traffic")) return;
+    onFocus(win.id);
+    dragging.current = {
+      sx: e.clientX,
+      sy: e.clientY,
+      ox: win.x,
+      oy: win.y
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const onPointerMove = e => {
+    if (!dragging.current || win.max) return;
+    onDrag(win.id, dragging.current.ox + (e.clientX - dragging.current.sx), Math.max(6, dragging.current.oy + (e.clientY - dragging.current.sy)));
+  };
+  const onPointerUp = e => {
+    dragging.current = null;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {}
+  };
+  const onResizeDown = e => {
+    e.stopPropagation();
+    onFocus(win.id);
+    resizing.current = {
+      sx: e.clientX,
+      sy: e.clientY,
+      ow: win.w,
+      oh: win.h
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const onResizeMove = e => {
+    if (!resizing.current || win.max) return;
+    const nw = Math.max(340, resizing.current.ow + (e.clientX - resizing.current.sx));
+    const nh = Math.max(240, resizing.current.oh + (e.clientY - resizing.current.sy));
+    onResize(win.id, nw, nh);
+  };
+  const onResizeUp = e => {
+    resizing.current = null;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {}
+  };
+  const style = win.max ? {
+    left: 8,
+    top: 8,
+    width: "calc(100vw - 16px)",
+    height: "calc(100vh - 120px)",
+    zIndex: win.z
+  } : {
+    left: win.x,
+    top: win.y,
+    width: win.w,
+    height: win.h,
+    zIndex: win.z
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "window" + (focused ? " focused" : "") + (win.state === "opening" ? " win-opening" : "") + (win.state === "closing" ? " win-closing" : "") + (win.state === "minimizing" ? " win-minimizing" : ""),
+    style: style,
+    onPointerDown: () => onFocus(win.id)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "titlebar",
+    onPointerDown: onPointerDown,
+    onPointerMove: onPointerMove,
+    onPointerUp: onPointerUp,
+    onDoubleClick: () => onMaximize(win.id)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "traffic"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "tl red",
+    onClick: () => onClose(win.id),
+    "aria-label": "Close"
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "tl yellow",
+    onClick: () => onMinimize(win.id),
+    "aria-label": "Minimize"
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "tl green",
+    onClick: () => onMaximize(win.id),
+    "aria-label": "Zoom"
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "win-title"
+  }, win.title), /*#__PURE__*/React.createElement("div", {
+    className: "title-spacer"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "window-body"
+  }, children), !win.max && /*#__PURE__*/React.createElement("div", {
+    className: "resize-handle",
+    onPointerDown: onResizeDown,
+    onPointerMove: onResizeMove,
+    onPointerUp: onResizeUp,
+    "aria-label": "Resize"
+  }));
+}
+
+/* ---------- DOCK ICONS (macOS-style, recreated in SVG) ------------------- */
+
+const Tile = ({
+  children,
+  bg,
+  cls
+}) => /*#__PURE__*/React.createElement("span", {
+  className: "dock-tile" + (cls ? " " + cls : ""),
+  style: bg ? {
+    background: bg
+  } : undefined
+}, children);
+const IMG_MAP = {
+  about: "7-CV",
+  work: "3-MyWork",
+  contact: "2-Contact",
+  adobe: "4-adobe",
+  intel: "6-ia",
+  cv: "7-CV",
+  instagram: "9-instagram",
+  linkedin: "10-linkedin",
+  bin: "12-folder",
+  error: "error",
+  atlassian: "structure"
+};
+function DockGlyph({
+  id
+}) {
+  if (IMG_MAP[id]) return /*#__PURE__*/React.createElement("img", {
+    className: "dock-img",
+    src: ICONS[IMG_MAP[id]],
+    alt: "",
+    draggable: false
+  });
+  return /*#__PURE__*/React.createElement(Tile, {
+    bg: "#ccc"
+  });
+}
+const DOCK_ITEMS = [{
+  id: "about",
+  label: "About Me",
+  kind: "win"
+}, {
+  id: "adobe",
+  label: "Creative Mind",
+  kind: "win"
+}, {
+  id: "atlassian",
+  label: "Structure Mind",
+  kind: "win"
+}, {
+  id: "intel",
+  label: "Exploration Mind",
+  kind: "win"
+}, {
+  id: "sep1",
+  kind: "sep"
+}, {
+  id: "work",
+  label: "Work",
+  kind: "win"
+}, {
+  id: "contact",
+  label: "Contact",
+  kind: "win"
+}, {
+  id: "error",
+  label: "Error",
+  kind: "win"
+}, {
+  id: "sep2",
+  kind: "sep"
+}, {
+  id: "bin",
+  label: "Ideas Folder",
+  kind: "win"
+}];
+function Dock({
+  onAction
+}) {
+  const [mouseX, setMouseX] = useState(null);
+  const refs = useRef({});
+  const scaleFor = id => {
+    if (mouseX == null || !refs.current[id]) return 1;
+    const r = refs.current[id].getBoundingClientRect();
+    const d = Math.abs(mouseX - (r.left + r.width / 2));
+    const max = 120;
+    if (d > max) return 1;
+    const t = 1 - d / max;
+    return 1 + 0.46 * t * t;
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "dock-wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "dock",
+    onMouseMove: e => setMouseX(e.clientX),
+    onMouseLeave: () => setMouseX(null)
+  }, DOCK_ITEMS.map(item => {
+    if (item.kind === "sep") return /*#__PURE__*/React.createElement("div", {
+      key: item.id,
+      className: "dock-sep"
+    });
+    const s = scaleFor(item.id);
+    return /*#__PURE__*/React.createElement("button", {
+      key: item.id,
+      ref: el => refs.current[item.id] = el,
+      className: "dock-item",
+      style: {
+        transform: `scale(${s}) translateY(${-(s - 1) * 18}px)`
+      },
+      onClick: () => onAction(item)
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "dock-tip"
+    }, item.label), /*#__PURE__*/React.createElement(DockGlyph, {
+      id: item.id
+    }));
+  })));
+}
+
+/* ---------- APP ----------------------------------------------------------- */
+
+let ZSEED = 100;
+function App() {
+  const [wins, setWins] = useState([]);
+  const [iconPos, setIconPos] = useState(() => Object.fromEntries(LAYOUT.map(p => [p.id, {
+    x: p.x,
+    y: p.y
+  }])));
+  const moveIcon = useCallback((id, x, y) => setIconPos(s => ({
+    ...s,
+    [id]: {
+      x,
+      y
+    }
+  })), []);
+  const projectMap = useRef(Object.fromEntries(PROJECTS.map(p => [p.id, p])));
+  const errIdRef = useRef(null);
+  const focus = useCallback(id => setWins(ws => ws.map(w => w.id === id ? {
+    ...w,
+    z: ++ZSEED,
+    min: false
+  } : w)), []);
+  const spawn = useCallback(cfg => {
+    setWins(ws => {
+      const ex = ws.find(w => w.key === cfg.key && w.state !== "closing");
+      if (ex) return ws.map(w => w.id === ex.id ? {
+        ...w,
+        z: ++ZSEED,
+        min: false,
+        state: "open"
+      } : w);
+      const id = "w" + Math.random().toString(36).slice(2, 8);
+      const offset = ws.length % 5 * 28;
+      const vw = window.innerWidth;
+      const SIDE = 66; /* borde derecho de la barra lateral (solo móvil) */
+      const w = IS_MOBILE ? Math.min(cfg.w || 720, vw - SIDE - 12) : Math.min(cfg.w || 720, vw - 32);
+      const x = IS_MOBILE ? SIDE : Math.max(16, (vw - w) / 2 - 30 + offset);
+      const nw = {
+        id,
+        key: cfg.key,
+        title: cfg.title,
+        render: cfg.render,
+        x,
+        y: 44 + offset,
+        w,
+        h: cfg.h || 540,
+        z: ++ZSEED,
+        max: false,
+        min: false,
+        state: "opening"
+      };
+      setTimeout(() => setWins(c => c.map(x => x.id === id ? {
+        ...x,
+        state: "open"
+      } : x)), 320);
+      return [...ws, nw];
+    });
+  }, []);
+  const close = useCallback(id => {
+    setWins(ws => ws.map(w => w.id === id ? {
+      ...w,
+      state: "closing"
+    } : w));
+    setTimeout(() => setWins(ws => ws.filter(w => w.id !== id)), 230);
+  }, []);
+  const minimize = useCallback(id => {
+    setWins(ws => ws.map(w => w.id === id ? {
+      ...w,
+      state: "minimizing"
+    } : w));
+    setTimeout(() => setWins(ws => ws.map(w => w.id === id ? {
+      ...w,
+      min: true,
+      state: "open"
+    } : w)), 350);
+  }, []);
+  const maximize = useCallback(id => setWins(ws => ws.map(w => w.id === id ? {
+    ...w,
+    max: !w.max,
+    z: ++ZSEED
+  } : w)), []);
+  const drag = useCallback((id, x, y) => setWins(ws => ws.map(w => w.id === id ? {
+    ...w,
+    x,
+    y
+  } : w)), []);
+  const resize = useCallback((id, nw, nh) => setWins(ws => ws.map(w => w.id === id ? {
+    ...w,
+    w: nw,
+    h: nh
+  } : w)), []);
+  const openProject = useCallback(p => spawn({
+    key: "proj-" + p.id,
+    title: "Information about: " + p.short,
+    w: 900,
+    h: 720,
+    render: () => /*#__PURE__*/React.createElement(ProjectContent, {
+      project: p
+    })
+  }), [spawn]);
+  const onDockAction = useCallback(item => {
+    if (item.kind === "link") {
+      if (item.href) window.open(item.href, "_blank");
+      return;
+    }
+    if (item.id === "about") spawn({
+      key: "about",
+      title: "About Me",
+      w: 740,
+      h: 640,
+      render: () => /*#__PURE__*/React.createElement(AboutWindow, null)
+    });
+    if (item.id === "work") spawn({
+      key: "work",
+      title: "Work",
+      w: 840,
+      h: 600,
+      render: () => /*#__PURE__*/React.createElement(WorkContent, {
+        onOpen: openProject
+      })
+    });
+    if (item.id === "contact") spawn({
+      key: "contact",
+      title: "Contact",
+      w: 600,
+      h: 700,
+      render: () => /*#__PURE__*/React.createElement(ContactContent, null)
+    });
+    if (item.id === "cv") spawn({
+      key: "cv",
+      title: "CV",
+      w: 580,
+      h: 680,
+      render: () => /*#__PURE__*/React.createElement(CVContent, null)
+    });
+    if (item.id === "adobe") spawn({
+      key: "adobe",
+      title: "Creative Mind",
+      w: 620,
+      h: 600,
+      render: () => /*#__PURE__*/React.createElement(MindContent, MINDS.adobe)
+    });
+    if (item.id === "atlassian") spawn({
+      key: "atlassian",
+      title: "Structure Mind",
+      w: 620,
+      h: 600,
+      render: () => /*#__PURE__*/React.createElement(MindContent, MINDS.atlassian)
+    });
+    if (item.id === "intel") spawn({
+      key: "intel",
+      title: "Exploration Mind",
+      w: 620,
+      h: 600,
+      render: () => /*#__PURE__*/React.createElement(MindContent, MINDS.intel)
+    });
+    if (item.id === "bin") spawn({
+      key: "bin",
+      title: "Ideas Folder",
+      w: 780,
+      h: 560,
+      render: () => /*#__PURE__*/React.createElement(FolderWindow, {
+        onOpen: openProject
+      })
+    });
+    if (item.id === "error") spawn({
+      key: "error",
+      title: "Error",
+      w: 400,
+      h: 300,
+      render: () => /*#__PURE__*/React.createElement(ErrorContent, {
+        onClose: () => close(errIdRef.current)
+      })
+    });
+  }, [spawn, openProject, close]);
+  useEffect(() => {
+    const e = wins.find(w => w.key === "error" && w.state !== "closing");
+    errIdRef.current = e ? e.id : null;
+  }, [wins]);
+  const topWin = wins.filter(w => !w.min).sort((a, b) => b.z - a.z)[0];
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("style", null, CSS), /*#__PURE__*/React.createElement("div", {
+    className: "desktop"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "wallpaper"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "wallpaper-veil"
+  }), LAYOUT.map(d => /*#__PURE__*/React.createElement(DesktopIcon, {
+    key: d.id,
+    project: projectMap.current[d.id],
+    pos: {
+      x: iconPos[d.id].x,
+      y: iconPos[d.id].y,
+      w: d.w,
+      h: d.h
+    },
+    onMove: moveIcon,
+    onOpen: openProject
+  })), wins.map(w => w.min ? null : /*#__PURE__*/React.createElement(WindowFrame, {
+    key: w.id,
+    win: w,
+    focused: topWin && topWin.id === w.id,
+    onFocus: focus,
+    onClose: close,
+    onMinimize: minimize,
+    onMaximize: maximize,
+    onDrag: drag,
+    onResize: resize
+  }, w.render())), /*#__PURE__*/React.createElement(Dock, {
+    onAction: onDockAction
+  })));
+}
+
+/* ---------- STYLES -------------------------------------------------------- */
+
+const CSS = `
+*{box-sizing:border-box;}
+html,body,#root{height:100%;margin:0;overflow:hidden;}
+.desktop{position:fixed;inset:0;overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Inter,sans-serif;
+  -webkit-font-smoothing:antialiased;color:#1d1d1f;user-select:none;}
+
+/* crisp wallpaper (no blur) */
+/* crisp full-screen wallpaper */
+.wallpaper{position:absolute;inset:0;z-index:0;background-image:url("${BG_DATA_URI}");background-size:cover;background-position:center;image-rendering:auto;}
+.wallpaper-veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0) 80%, rgba(0,0,0,0.16) 100%);}
+
+/* desktop cover-art icons */
+.desk-icon{position:absolute;z-index:5;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:7px;width:112px;background:none;border:0;cursor:grab;touch-action:none;padding:6px;border-radius:10px;transition:transform .2s cubic-bezier(.2,.8,.3,1);}
+.desk-icon:active{cursor:grabbing;}
+.desk-icon:hover{transform:translate(-50%,-50%) scale(1.07);}
+.desk-icon:hover .desk-label{background:rgba(0,122,255,0.96);color:#fff;text-shadow:none;}
+.thumb{position:relative;overflow:hidden;background-size:cover;background-position:center;display:inline-block;box-shadow:0 10px 22px rgba(15,15,35,0.4),0 2px 5px rgba(15,15,35,0.3);}
+.thumb-img{display:block;width:auto;height:auto;object-fit:contain;box-shadow:0 10px 22px rgba(15,15,35,0.4),0 2px 5px rgba(15,15,35,0.3);}
+.cover-frame{position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.28),inset 0 0 0 1.5px rgba(255,255,255,0.06);}
+.cover-vignette{position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120% 120% at 50% 30%,transparent 45%,rgba(0,0,0,0.32) 100%);}
+.cover-grain{position:absolute;inset:0;border-radius:inherit;opacity:0.16;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+.desk-label{display:inline-block;font-size:11px;font-weight:700;line-height:1.3;text-align:center;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:6px;color:#fff;max-width:160px;white-space:normal;overflow-wrap:normal;word-break:normal;hyphens:none;text-shadow:0 1px 4px rgba(0,0,0,0.6),0 0 2px rgba(0,0,0,0.5);}
+
+/* windows */
+.window{position:absolute;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;background:rgba(252,252,253,0.86);backdrop-filter:blur(34px) saturate(185%);-webkit-backdrop-filter:blur(34px) saturate(185%);box-shadow:0 1px 1px rgba(0,0,0,0.04),0 22px 42px -12px rgba(20,20,50,0.4),0 48px 90px -20px rgba(20,20,50,0.34),0 0 0 0.5px rgba(0,0,0,0.14);transition:box-shadow .25s ease;}
+.window.focused{box-shadow:0 1px 1px rgba(0,0,0,0.05),0 30px 56px -12px rgba(20,20,50,0.5),0 60px 110px -22px rgba(20,20,50,0.42),0 0 0 0.5px rgba(0,0,0,0.18);}
+.win-opening{animation:winIn .3s cubic-bezier(.2,.9,.3,1.04);}
+.win-closing{animation:winOut .22s ease forwards;pointer-events:none;}
+.win-minimizing{animation:winMin .35s cubic-bezier(.5,0,.7,.4) forwards;pointer-events:none;}
+@keyframes winIn{from{opacity:0;transform:scale(.93);}to{opacity:1;transform:scale(1);}}
+@keyframes winOut{from{opacity:1;transform:scale(1);}to{opacity:0;transform:scale(.95);}}
+@keyframes winMin{from{opacity:1;transform:scale(1);}to{opacity:0;transform:translateY(60vh) scale(.16);}}
+.titlebar{height:42px;flex-shrink:0;display:flex;align-items:center;padding:0 15px;cursor:grab;background:rgba(255,255,255,0.4);border-bottom:0.5px solid rgba(0,0,0,0.08);}
+.titlebar:active{cursor:grabbing;}
+.traffic{display:flex;gap:8px;align-items:center;width:64px;}
+.resize-handle{position:absolute;right:0;bottom:0;width:20px;height:20px;cursor:nwse-resize;z-index:50;touch-action:none;}
+.resize-handle::after{content:"";position:absolute;right:3px;bottom:3px;width:8px;height:8px;border-right:1.5px solid rgba(0,0,0,0.22);border-bottom:1.5px solid rgba(0,0,0,0.22);border-bottom-right-radius:3px;opacity:0;transition:opacity .15s ease;}
+.window:hover .resize-handle::after{opacity:1;}
+.tl{width:12px;height:12px;border-radius:50%;border:0.5px solid rgba(0,0,0,0.1);cursor:pointer;padding:0;}
+.tl.red{background:#ff5f57;}.tl.yellow{background:#febc2e;}.tl.green{background:#28c840;}
+.win-title{flex:1;text-align:center;font-size:13px;font-weight:600;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px;}
+.title-spacer{width:64px;}
+.window-body{flex:1;overflow:auto;background:rgba(255,255,255,0.66);}
+.window-body::-webkit-scrollbar{width:10px;}
+.window-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.18);border-radius:6px;border:2px solid transparent;background-clip:padding-box;}
+
+/* project content */
+.content-pad{padding:0 0 32px;}
+.hero{height:220px;background-size:cover !important;background-position:center !important;position:relative;display:flex;align-items:flex-end;}
+.hero-overlay{padding:24px 30px;width:100%;background:linear-gradient(to top,rgba(0,0,0,0.55),transparent);color:#fff;}
+.hero-overlay h1{margin:0;font-size:28px;font-weight:800;letter-spacing:-0.5px;line-height:1.12;text-shadow:0 2px 16px rgba(0,0,0,.4);}
+.hero-overlay p{margin:7px 0 0;font-size:13.5px;opacity:.92;font-weight:500;}
+.tag-row{display:flex;gap:8px;flex-wrap:wrap;padding:20px 30px 2px;}
+.tag{font-size:12px;font-weight:600;color:#0a64d6;background:rgba(10,100,214,0.1);padding:5px 12px;border-radius:20px;}
+.body-text{padding:14px 30px 0;font-size:14.5px;line-height:1.65;color:#2c2c2e;max-width:680px;}
+.body-text.muted{color:#86868b;font-size:13px;}
+.gallery{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:24px 30px 0;}
+.gallery-cell{height:165px;border-radius:12px;background-size:cover !important;background-position:center !important;box-shadow:0 10px 26px rgba(20,20,50,0.16);}
+/* ---- Project window: macOS "Get Info" style ---- */
+.info-doc{padding:18px 22px 28px;color:#1d1d1f;}
+.info-head{display:flex;align-items:center;gap:14px;padding-bottom:15px;}
+.info-icon{width:56px;height:56px;border-radius:13px;flex:0 0 auto;background-size:cover !important;background-position:center !important;box-shadow:0 5px 13px rgba(20,20,50,0.2),inset 0 0 0 0.5px rgba(0,0,0,0.14);}
+.info-head-text{min-width:0;}
+.info-name{margin:0;font-size:16.5px;font-weight:700;letter-spacing:-0.2px;line-height:1.2;}
+.info-sub{margin:3px 0 0;font-size:12.5px;color:#6e6e73;font-weight:500;}
+.info-desc{margin:0;padding:14px 0;border-top:0.5px solid rgba(0,0,0,0.13);}
+.info-desc p{margin:0 0 10px;font-size:12.5px;line-height:1.58;color:#2c2c2e;}
+.info-desc p:last-child{margin-bottom:0;}
+.info-section{border-top:0.5px solid rgba(0,0,0,0.13);padding:10px 0;}
+.info-summary{cursor:pointer;font-size:12.5px;font-weight:600;color:#1d1d1f;list-style:none;user-select:none;outline:none;display:flex;align-items:center;}
+.info-summary::-webkit-details-marker{display:none;}
+.info-summary::before{content:"\\25B8";display:inline-block;margin-right:8px;font-size:10px;color:#8e8e93;transition:transform .15s ease;}
+.info-section[open] .info-summary::before{transform:rotate(90deg);}
+.info-rows{padding:11px 0 3px 20px;display:flex;flex-direction:column;gap:7px;}
+.info-row{display:flex;gap:8px;font-size:12.5px;line-height:1.45;}
+.info-key{color:#6e6e73;font-weight:600;flex:0 0 auto;}
+.info-val{color:#1d1d1f;}
+.info-preview{padding:13px 0 3px 20px;}
+.info-preview-img{display:block;width:100%;height:auto;border-radius:11px;background:#fff;box-shadow:0 9px 24px rgba(20,20,50,0.17),inset 0 0 0 0.5px rgba(0,0,0,0.1);}
+.info-media{border-radius:11px;overflow:hidden;background:#fff;box-shadow:0 9px 24px rgba(20,20,50,0.17),inset 0 0 0 0.5px rgba(0,0,0,0.1);font-size:0;line-height:0;}
+.info-media-img{display:block;width:100%;height:auto;margin:0;}.info-media-pad{padding-top:26px;padding-bottom:26px;}.info-media-flush{border-radius:0;}.info-vgrid{background:#181818;container-type:inline-size;}.info-vgrid .vg-inner{display:grid;grid-template-columns:1fr;gap:12px;padding:18px;}@container (min-width:520px){.info-vgrid .vg-inner{grid-template-columns:repeat(3,1fr);}}.info-vgrid .vg-item{position:relative;aspect-ratio:9/16;background:#000;overflow:hidden;}.info-vgrid .vg-item iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;}
+.info-gallery{display:flex;flex-direction:column;align-items:center;}
+.info-gallery-img{width:auto;max-width:100%;max-height:540px;}
+.info-gallery-img+.info-gallery-img{margin-top:16px;}
+.info-preview-grad{width:100%;height:210px;border-radius:11px;box-shadow:0 9px 24px rgba(20,20,50,0.17);}
+.info-video{position:relative;width:100%;padding-top:56.25%;border-radius:11px;overflow:hidden;background:#000;box-shadow:0 9px 24px rgba(20,20,50,0.17),inset 0 0 0 0.5px rgba(0,0,0,0.1);}
+.info-video iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.info-video-facade{display:block;border:0;padding:56.25% 0 0;cursor:pointer;background-color:#000;background-size:cover !important;background-position:center !important;}
+.yt-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:45px;border-radius:12px;background:rgba(18,18,18,0.74);display:flex;align-items:center;justify-content:center;transition:background .15s ease,transform .15s ease;}
+.info-video-facade:hover .yt-play{background:#ff0000;transform:translate(-50%,-50%) scale(1.05);}
+.yt-play svg{width:26px;height:26px;fill:#fff;margin-left:3px;}
+.yt-wrap{display:block;}
+.yt-link{display:inline-block;margin-top:9px;font-size:12px;font-weight:600;color:#0a64d6;text-decoration:none;}
+.yt-link:hover{text-decoration:underline;}
+
+/* About, editorial */
+.about-doc{padding:54px 60px 60px;max-width:600px;}
+.about-eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#a1a1aa;margin:0 0 18px;}
+.about-h1{font-family:"New York","Iowan Old Style",Georgia,"Times New Roman",serif;font-size:40px;line-height:1.08;font-weight:600;letter-spacing:-0.5px;margin:0 0 16px;color:#161617;}
+.about-lead{font-family:"New York",Georgia,serif;font-size:22px;line-height:1.4;font-style:italic;color:#3a3a3c;margin:0 0 30px;}
+.about-p{font-size:14px;line-height:1.85;color:#4a4a50;margin:0 0 18px;font-weight:400;}
+.about-closing{color:#7a7a80;}
+.about-mind{font-size:14px;line-height:1.85;color:#4a4a50;margin:0 0 18px;}
+.about-mind.first{font-family:"New York",Georgia,serif;font-size:20px;font-style:italic;line-height:1.45;color:#33333a;margin:0 0 26px;}
+
+/* About window with About me / CV sidebar tabs */
+.aboutwin{display:flex;height:100%;min-height:0;}
+.aboutwin-side{flex:0 0 clamp(104px,30%,176px);background:rgba(246,246,248,0.72);border-right:0.5px solid rgba(0,0,0,0.1);padding:22px 12px;display:flex;flex-direction:column;gap:3px;}
+.aboutwin-side-title{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:#9a9aa0;margin:0 0 12px 10px;}
+.aboutwin-tab{display:block;width:100%;text-align:left;font-size:14.5px;font-weight:600;color:#3a3a3c;background:none;border:0;border-radius:8px;padding:9px 12px;cursor:pointer;font-family:inherit;transition:background .15s,color .15s;}
+.aboutwin-tab:hover{background:rgba(0,0,0,0.055);}
+.aboutwin-tab.active{background:#0a7bff;color:#fff;}
+.aboutwin-main{flex:1;min-width:0;overflow:auto;}
+.aboutwin-main .about-doc{padding:46px 46px 54px;max-width:560px;}
+.free-doc{padding:24px 26px 32px;}
+.free-card{display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:rgba(255,255,255,0.6);border:0.5px solid rgba(0,0,0,0.08);border-radius:16px;padding:16px;box-shadow:0 8px 22px rgba(20,20,50,0.08);}
+.free-thumb{flex:0 0 140px;height:140px;border-radius:12px;background-color:#1c1c1e;background-size:cover;background-position:center;box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.25);}
+.free-info{flex:1;min-width:200px;}
+.free-title{margin:0 0 6px;font-size:15px;font-weight:700;color:#1d1d1f;}
+.free-desc{margin:0 0 14px;font-size:13px;line-height:1.55;color:#4a4a50;}
+.free-dl{display:inline-flex;align-items:center;font-size:13.5px;font-weight:700;color:#0a64d6;text-decoration:none;padding:9px 16px;border-radius:10px;background:rgba(10,100,214,0.1);transition:background .15s;}
+.free-dl:hover{background:rgba(10,100,214,0.18);}
+.free-card + .free-card{margin-top:16px;}
+
+/* Contact */
+.contact-doc{padding:44px 48px 48px;max-width:540px;}
+.contact-h1{font-family:"New York",Georgia,serif;font-size:32px;font-weight:600;letter-spacing:-0.4px;margin:0 0 14px;color:#161617;}
+.contact-lead{font-size:16px;line-height:1.65;color:#3d3d40;margin:0 0 26px;}
+.contact-sub{font-size:14.5px;line-height:1.6;color:#86868b;margin:0 0 12px;}
+.contact-sent{display:flex;flex-direction:column;align-items:flex-start;gap:6px;justify-content:center;}
+.sent-check{width:54px;height:54px;border-radius:50%;background:#28c840;color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 8px 20px rgba(40,200,64,0.34);}
+.form{display:flex;flex-direction:column;gap:18px;margin-top:24px;}
+.field{display:flex;flex-direction:column;gap:8px;}
+.field-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#86868b;}
+.field-input{font-family:inherit;font-size:15px;color:#1d1d1f;background:#fff;border:1px solid #dcdce2;border-radius:11px;padding:13px 15px;outline:none;transition:border .15s,box-shadow .15s;width:100%;}
+.field-input:focus{border-color:#0a7bff;box-shadow:0 0 0 3px rgba(10,123,255,0.16);}
+.field-area{resize:none;line-height:1.55;}
+.sketch-block{display:flex;flex-direction:column;gap:9px;}
+.sketch-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.sketch-tools{display:flex;align-items:center;gap:6px;}
+.tool-btn{width:30px;height:28px;display:inline-flex;align-items:center;justify-content:center;padding:0;border:1px solid #dcdce2;background:#fff;border-radius:8px;cursor:pointer;color:#3a3a3c;transition:.12s;}
+.tool-btn svg{width:16px;height:16px;display:block;}
+.tool-btn:hover{background:#f1f4f9;border-color:#c3c8d2;}
+.tool-btn.active{background:#0a7bff;border-color:#0a7bff;color:#fff;}
+.sketch-clear{font-size:12px;font-weight:600;color:#0a7bff;background:rgba(10,123,255,0.1);border:0;border-radius:8px;padding:6px 13px;cursor:pointer;}
+.sketch-clear:hover{background:rgba(10,123,255,0.18);}
+.sketch-canvas{width:100%;height:185px;background:#fff;border:1px solid #dcdce2;border-radius:14px;cursor:crosshair;touch-action:none;box-shadow:inset 0 2px 6px rgba(0,0,0,0.06);}
+.checkbox-row{display:flex;align-items:center;gap:11px;font-size:14.5px;color:#3d3d40;cursor:pointer;}
+.checkbox-row input{width:18px;height:18px;accent-color:#0a7bff;}
+.primary-btn{margin-top:4px;font-size:15px;font-weight:700;color:#fff;background:#0a7bff;border:0;border-radius:12px;padding:14px 24px;cursor:pointer;box-shadow:0 6px 16px rgba(10,123,255,0.32);transition:background .15s,transform .1s;}
+.primary-btn:hover{background:#0a64d6;}
+.primary-btn:active{transform:scale(0.99);}
+.primary-btn:disabled{opacity:.6;cursor:default;}
+.form-note{font-size:11.5px;color:#9b9ba1;margin:2px 0 0;}
+.form-note.err{color:#d9472b;}.form-note.ok{color:#1a8a4a;}
+.contact-links{display:flex;gap:10px;margin-top:30px;border-top:1px solid #ececf0;padding-top:24px;}
+.req{color:#ff5f57;font-weight:800;}
+.field-err{border-color:#ff5f57 !important;box-shadow:0 0 0 3px rgba(255,95,87,0.16) !important;}
+.contact-outro{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin-top:32px;border-top:1px solid #ececf0;padding-top:26px;}
+.contact-outro-text{font-size:13.5px;color:#86868b;font-weight:600;}
+.linkedin-btn{display:inline-flex;align-items:center;gap:11px;text-decoration:none;font-size:15px;font-weight:700;color:#fff;background:linear-gradient(180deg,#0a85ff,#0a66c2);padding:13px 20px;border-radius:13px;box-shadow:0 8px 20px rgba(10,102,194,0.36);transition:transform .12s,box-shadow .15s;}
+.linkedin-btn:hover{transform:translateY(-1px);box-shadow:0 11px 26px rgba(10,102,194,0.46);}
+.li-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:7px;background:#fff;color:#0a66c2;font-size:14px;font-weight:900;}
+.contact-link{display:flex;align-items:center;gap:9px;text-decoration:none;color:#2c2c2e;font-size:13.5px;font-weight:600;padding:9px 14px;border-radius:11px;background:rgba(0,0,0,0.04);border:0.5px solid rgba(0,0,0,0.06);transition:.15s;}
+.contact-link:hover{background:rgba(10,100,214,0.1);color:#0a64d6;}
+.cl-glyph{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:rgba(10,100,214,0.12);font-size:12px;font-weight:800;}
+
+/* Work, projects only, large grid */
+.work-grid-wrap{padding:26px 28px 32px;}
+.work-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:22px 18px;}
+.work-item{display:flex;flex-direction:column;align-items:center;gap:11px;background:none;border:0;cursor:pointer;padding:8px;border-radius:12px;transition:.15s;}
+.work-item:hover{background:rgba(10,100,214,0.08);}
+.work-item.static{cursor:default;}
+.work-label{font-size:12px;font-weight:600;color:#333;text-align:center;line-height:1.3;word-break:break-word;}
+.bin-note{font-size:13.5px;color:#6a6a70;margin:0 0 20px;font-weight:500;padding:0 8px;}
+
+/* CV */
+.cv-doc{padding:26px;display:flex;flex-direction:column;align-items:center;gap:16px;}
+.cv-page{background:#fff;width:100%;max-width:430px;padding:32px 36px;border-radius:6px;box-shadow:0 12px 34px rgba(20,20,50,0.18);font-size:13px;color:#2c2c2e;line-height:1.55;}
+.cv-name{font-size:20px;font-weight:800;letter-spacing:1px;margin:0;}
+.cv-sub{color:#86868b;font-weight:600;margin:4px 0 0;font-size:12.5px;}
+.cv-contact{color:#9b9ba1;font-size:11px;margin:8px 0 0;line-height:1.5;}
+.cv-dim{color:#86868b;font-size:12px;margin:3px 0 0;}
+.cv-page hr{border:0;border-top:1px solid #eee;margin:18px 0;}
+.cv-page h3{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:#0a64d6;margin:18px 0 6px;}
+.cv-page p{margin:5px 0;}
+.cv-download{font-size:14px;font-weight:700;color:#0a64d6;text-decoration:none;padding:11px 20px;border-radius:11px;background:rgba(10,100,214,0.1);}
+.cv-download:hover{background:rgba(10,100,214,0.18);}
+
+/* Error */
+.error-dialog{display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px;height:100%;justify-content:center;}
+.error-badge{font-size:44px;margin-bottom:8px;}
+.error-title{font-size:16px;font-weight:800;margin:0 0 8px;color:#1d1d1f;}
+.error-body{font-size:13.5px;color:#555;line-height:1.55;margin:0 0 22px;max-width:300px;}
+.error-ok{font-size:13.5px;font-weight:700;color:#fff;background:#0a7bff;border:0;border-radius:9px;padding:9px 22px;cursor:pointer;}
+.error-ok:hover{background:#0a64d6;}
+
+/* dock */
+.dock-wrap{position:absolute;left:0;right:0;bottom:34px;z-index:100000;display:flex;justify-content:center;pointer-events:none;}
+.dock{display:flex;align-items:flex-end;gap:9px;padding:9px 13px;background:rgba(255,255,255,0.32);backdrop-filter:blur(30px) saturate(190%);-webkit-backdrop-filter:blur(30px) saturate(190%);border-radius:24px;border:0.5px solid rgba(255,255,255,0.55);box-shadow:0 20px 48px rgba(20,20,50,0.32),inset 0 0 0 0.5px rgba(255,255,255,0.3);pointer-events:auto;max-width:96vw;}
+.dock-sep{width:1px;height:48px;background:rgba(0,0,0,0.15);margin:0 3px;align-self:center;}
+.dock-item{position:relative;background:none;border:0;padding:0;cursor:pointer;transform-origin:bottom center;transition:transform .12s ease;}
+.dock-tile{display:flex;align-items:center;justify-content:center;width:54px;height:54px;border-radius:13px;overflow:hidden;box-shadow:0 6px 14px rgba(20,20,50,0.24),inset 0 0 0 0.5px rgba(255,255,255,0.28);}
+.dock-tile.finder svg{display:block;}
+.dock-img{width:54px;height:54px;object-fit:contain;display:block;filter:drop-shadow(0 6px 9px rgba(20,20,50,0.32));pointer-events:none;}
+.dock-tip{position:absolute;bottom:calc(100% + 13px);left:50%;transform:translateX(-50%);background:rgba(40,40,45,0.94);color:#fff;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s ease;}
+.dock-tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:rgba(40,40,45,0.94);}
+.dock-item:hover .dock-tip{opacity:1;}
+
+/* ============================ MOBILE ONLY ============================ */
+@media (max-width: 1024px){.wallpaper{background-image:none !important;background:${MOBILE_BG} !important;background-size:cover !important;background-position:center !important;}/* Dock: barra vertical izquierda en móvil/tablet (≤1024px) */.dock-wrap{left:0;right:auto;bottom:auto;top:50%;transform:translateY(-50%);justify-content:flex-start;}.dock{flex-direction:column;align-items:center;gap:7px;padding:10px 7px;border-radius:19px;margin-left:7px;max-width:none;overflow:visible;}.dock-item{transform:none !important;transition:none !important;transform-origin:left center;}.dock-tile{width:44px;height:44px;border-radius:11px;}.dock-img{width:44px;height:44px;}.dock-sep{width:30px;height:1px;margin:3px 0;align-self:center;}.dock-tip{bottom:auto;top:50%;left:calc(100% + 10px);transform:translateY(-50%);}.dock-tip::after{top:50%;left:auto;right:100%;transform:translateY(-50%);border:5px solid transparent;border-right-color:rgba(40,40,45,0.94);border-top-color:transparent;}}
+
+  @media (max-width: 768px){
+  /* Ocultar minimizar en movil (no hay barra para recuperar la ventana) */
+  .tl.yellow{display:none !important;}
+
+  /* Free Stuff: apilar tarjeta en movil para que el texto no se corte */
+  .free-card{flex-direction:column;align-items:stretch;}.free-thumb{width:100%;height:150px;flex:0 0 auto;}.free-info{min-width:0;width:100%;}
+
+  /* 4. Wallpaper móvil (placeholder reemplazable via MOBILE_BG) */
+  .wallpaper{background-image:none !important;background:${MOBILE_BG} !important;background-size:cover !important;background-position:center !important;}
+
+  /* 3. Elementos del escritorio (iconos, documentos, miniaturas) más pequeños */
+  .desk-icon{transform:translate(-50%,-50%) scale(0.82) !important;width:92px;gap:5px;padding:4px;}
+  .desk-icon:hover{transform:translate(-50%,-50%) scale(0.82) !important;}
+  .desk-label{font-size:12px;line-height:1.25;max-width:160px;padding:3px 7px;white-space:normal;word-break:normal;overflow-wrap:normal;}
+
+}
+`;
+try {
+  ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+  var b = document.getElementById('boot'); if (b) b.remove();
+} catch (e) {
+  document.getElementById('boot').textContent = 'Error: ' + e.message;
+  console.error(e);
+}
+</script>
+</body>
+</html>
