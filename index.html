@@ -1408,7 +1408,7 @@ function WindowFrame({
   };
   const onPointerMove = e => {
     if (!dragging.current || win.max) return;
-    onDrag(win.id, dragging.current.ox + (e.clientX - dragging.current.sx), Math.max(6, dragging.current.oy + (e.clientY - dragging.current.sy)));
+    onDrag(win.id, dragging.current.ox + (e.clientX - dragging.current.sx), Math.max(30, dragging.current.oy + (e.clientY - dragging.current.sy)));
   };
   const onPointerUp = e => {
     dragging.current = null;
@@ -1441,9 +1441,9 @@ function WindowFrame({
   };
   const style = win.max ? {
     left: 8,
-    top: 8,
+    top: 36,
     width: "calc(100vw - 16px)",
-    height: "calc(100vh - 120px)",
+    height: "calc(100vh - 148px)",
     zIndex: win.z
   } : {
     left: win.x,
@@ -1610,10 +1610,158 @@ function Dock({
   })));
 }
 
+/* ---------- MENU BAR (macOS style) -------------------------------------- */
+const STATUS_TEXT = "Open to new projects"; /* leave "" to hide the status */
+const IT_MARK = /*#__PURE__*/React.createElement("svg", {
+  viewBox: "0 0 174 256",
+  "aria-hidden": "true"
+}, /*#__PURE__*/React.createElement("rect", { x: 0, y: 0, width: 48, height: 256 }), /*#__PURE__*/React.createElement("rect", { x: 60, y: 0, width: 114, height: 46 }), /*#__PURE__*/React.createElement("rect", { x: 93, y: 0, width: 48, height: 256 }));
+function useMadridClock() {
+  const fmt = () => {
+    try {
+      return {
+        time: new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", hour: "2-digit", minute: "2-digit" }).format(new Date()),
+        full: new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }).format(new Date())
+      };
+    } catch (e) {
+      const d = new Date();
+      return { time: String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"), full: d.toString() };
+    }
+  };
+  const [now, setNow] = useState(fmt);
+  useEffect(() => {
+    const id = setInterval(() => setNow(fmt()), 15000);
+    return () => clearInterval(id);
+  }, []);
+  return now;
+}
+function MenuBar({
+  projects,
+  onProject,
+  onDock,
+  onAboutDesigner,
+  onWelcome
+}) {
+  const [open, setOpen] = useState(null);
+  const [shut, setShut] = useState(null); /* null | down | joke | out */
+  const barRef = useRef(null);
+  const clock = useMadridClock();
+  useEffect(() => {
+    if (!open) return;
+    const away = e => { if (barRef.current && !barRef.current.contains(e.target)) setOpen(null); };
+    const esc = e => { if (e.key === "Escape") setOpen(null); };
+    document.addEventListener("pointerdown", away);
+    document.addEventListener("keydown", esc);
+    return () => { document.removeEventListener("pointerdown", away); document.removeEventListener("keydown", esc); };
+  }, [open]);
+  const shutDown = () => {
+    setShut("down");
+    setTimeout(() => setShut("joke"), 1500);
+    setTimeout(() => setShut("out"), 3600);
+    setTimeout(() => setShut(null), 4300);
+  };
+  const MENUS = [{
+    id: "logo",
+    logo: true,
+    items: [{ label: "About This Designer", run: onAboutDesigner }, { sep: true }, { label: "Shut Down…", run: shutDown }]
+  }, {
+    id: "app",
+    label: "Ivan Tejada",
+    app: true,
+    items: [{ label: "About Me", run: () => onDock("about") }, { sep: true }, { label: "Creative Mind", run: () => onDock("adobe") }, { label: "Structured Mind", run: () => onDock("atlassian") }, { label: "Exploratory Mind", run: () => onDock("intel") }]
+  }, {
+    id: "work",
+    label: "Work",
+    hideMobile: true,
+    items: [{ label: "All Work", run: () => onDock("work") }, { sep: true }].concat(projects.slice().sort((a, b) => a.short.localeCompare(b.short, "en", { sensitivity: "base", ignorePunctuation: true })).map(p => ({ label: p.short, run: () => onProject(p) }))).concat([{ sep: true }, { label: "Ideas Folder", run: () => onDock("bin") }])
+  }, {
+    id: "contact",
+    label: "Contact",
+    hideMobile: true,
+    items: [{ label: "Send a Message…", run: () => onDock("contact") }, { label: "LinkedIn", href: "https://www.linkedin.com/in/ivantejadarobles", blank: true }, { sep: true }, { label: "Download CV", href: CV_PDF, download: "Ivan_Tejada_CV_EN.pdf" }]
+  }, {
+    id: "help",
+    label: "Help",
+    hideMobile: true,
+    items: [{ label: "Show Welcome Tip", run: onWelcome }, { sep: true }, { label: "Report a Bug…", run: () => onDock("error") }]
+  }];
+  const item = (it, i) => {
+    if (it.sep) return /*#__PURE__*/React.createElement("div", { key: i, className: "mb-sep" });
+    if (it.href) return /*#__PURE__*/React.createElement("a", {
+      key: i,
+      className: "mb-item",
+      href: it.href,
+      download: it.download,
+      target: it.blank ? "_blank" : undefined,
+      rel: it.blank ? "noopener" : undefined,
+      onClick: () => setOpen(null)
+    }, it.label);
+    return /*#__PURE__*/React.createElement("button", {
+      key: i,
+      className: "mb-item",
+      onClick: () => { setOpen(null); it.run && it.run(); }
+    }, it.label);
+  };
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "menubar",
+    ref: barRef
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "mb-left"
+  }, MENUS.map(m => /*#__PURE__*/React.createElement("div", {
+    key: m.id,
+    className: "mb-wrap" + (m.hideMobile ? " mb-hide-m" : "")
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "mb-btn" + (m.logo ? " mb-logo" : "") + (m.app ? " mb-app" : "") + (open === m.id ? " open" : ""),
+    "aria-label": m.logo ? "Ivan Tejada menu" : undefined,
+    "aria-expanded": open === m.id,
+    onClick: () => setOpen(o => o === m.id ? null : m.id),
+    onMouseEnter: () => open && open !== m.id && setOpen(m.id)
+  }, m.logo ? IT_MARK : m.label), open === m.id && /*#__PURE__*/React.createElement("div", {
+    className: "mb-drop",
+    role: "menu"
+  }, m.items.map(item))))), /*#__PURE__*/React.createElement("div", {
+    className: "mb-right"
+  }, STATUS_TEXT && /*#__PURE__*/React.createElement("span", {
+    className: "mb-status mb-hide-m"
+  }, /*#__PURE__*/React.createElement("span", { className: "mb-dot" }), STATUS_TEXT), /*#__PURE__*/React.createElement("span", {
+    className: "mb-clock",
+    title: clock.full + " in Madrid"
+  }, /*#__PURE__*/React.createElement("span", { className: "mb-city" }, "Madrid"), " ", clock.time))), shut && /*#__PURE__*/React.createElement("div", {
+    className: "shut" + (shut === "out" ? " shut-out" : "")
+  }, shut === "down" ? "Shutting down…" : "Just kidding. Ideas don’t shut down."));
+}
+function AboutDesigner() {
+  const rows = [["Memory", "64 GB of references"], ["Graphics", "Pixel-perfect, mostly"], ["Startup Disk", "Coffee and a deadline"], ["Compatibility", "Works with teams of any size"], ["Software Update", "Learning every day"]];
+  return /*#__PURE__*/React.createElement("div", {
+    className: "atd"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "atd-photo",
+    role: "img",
+    "aria-label": "Ivan Tejada's avatar"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "atd-name"
+  }, "Ivan Tejada"), /*#__PURE__*/React.createElement("div", {
+    className: "atd-sub"
+  }, "Creative Lead, Madrid"), /*#__PURE__*/React.createElement("dl", {
+    className: "atd-specs"
+  }, rows.map(r => /*#__PURE__*/React.createElement(React.Fragment, {
+    key: r[0]
+  }, /*#__PURE__*/React.createElement("dt", null, r[0]), /*#__PURE__*/React.createElement("dd", null, r[1])))), /*#__PURE__*/React.createElement("div", {
+    className: "atd-btns"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "atd-btn primary",
+    href: CV_PDF,
+    download: "Ivan_Tejada_CV_EN.pdf"
+  }, "Download CV")), /*#__PURE__*/React.createElement("div", {
+    className: "atd-foot"
+  }, "™ and © " + new Date().getFullYear() + " Ivan Tejada. All ideas reserved."));
+}
+
 /* ---------- WELCOME NOTIFICATION (first visit) ------------------------- */
 const WELCOME_KEY = "it_welcome_v1";
 function Welcome({
   busy,
+  replay,
   onOpen
 }) {
   const [state, setState] = useState("hidden"); /* hidden | in | out */
@@ -1642,9 +1790,16 @@ function Welcome({
     if (state === "in") arm(11000);
     return () => clearTimeout(timer.current);
   }, [state, arm]);
+  const stateRef = useRef(state);
+  stateRef.current = state;
+  const prevBusy = useRef(busy);
   useEffect(() => {
-    if (busy && state === "in") hide();
-  }, [busy, state, hide]);
+    if (busy > prevBusy.current && stateRef.current === "in") hide(); /* a window was opened */
+    prevBusy.current = busy;
+  }, [busy, hide]);
+  useEffect(() => {
+    if (replay > 0) setState("in");
+  }, [replay]);
   if (state === "hidden" || state === "done") return null;
   const verb = touch ? "Tap" : "Click";
   const where = sideBar ? "on the left" : "at the bottom";
@@ -1855,6 +2010,18 @@ function App() {
     const e = wins.find(w => w.key === "error" && w.state !== "closing");
     errIdRef.current = e ? e.id : null;
   }, [wins]);
+  const [welcomeReplay, setWelcomeReplay] = useState(0);
+  const dockById = useCallback(id => onDockAction({
+    id,
+    kind: "win"
+  }), [onDockAction]);
+  const openAboutDesigner = useCallback(() => spawn({
+    key: "about-designer",
+    title: "",
+    w: 384,
+    h: 520,
+    render: () => /*#__PURE__*/React.createElement(AboutDesigner, null)
+  }), [spawn]);
   const topWin = wins.filter(w => !w.min).sort((a, b) => b.z - a.z)[0];
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("style", null, CSS), /*#__PURE__*/React.createElement("div", {
     className: "desktop"
@@ -1885,8 +2052,15 @@ function App() {
     onResize: resize
   }, w.render())), /*#__PURE__*/React.createElement(Dock, {
     onAction: onDockAction
+  }), /*#__PURE__*/React.createElement(MenuBar, {
+    projects: LAYOUT.map(d => projectMap.current[d.id]).filter(Boolean),
+    onProject: openProject,
+    onDock: dockById,
+    onAboutDesigner: openAboutDesigner,
+    onWelcome: () => setWelcomeReplay(n => n + 1)
   }), /*#__PURE__*/React.createElement(Welcome, {
-    busy: wins.length > 0,
+    replay: welcomeReplay,
+    busy: wins.length,
     onOpen: () => onDockAction({
       id: "about",
       kind: "win"
@@ -2108,8 +2282,52 @@ html,body,#root{height:100%;margin:0;overflow:hidden;}
 .dock-tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:rgba(40,40,45,0.94);}
 .dock-item:hover .dock-tip{opacity:1;}
 
+/* Menu bar (macOS style) */
+.menubar{position:absolute;top:0;left:0;right:0;height:28px;z-index:100003;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:0 max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left));font-size:13px;color:#1d1d1f;}
+.menubar::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:rgba(238,238,240,0.62);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);box-shadow:0 0.5px 0 rgba(0,0,0,0.14);}
+.mb-left,.mb-right{display:flex;align-items:center;height:100%;min-width:0;}
+.mb-wrap{position:relative;height:100%;display:flex;align-items:center;}
+.mb-btn{height:22px;display:flex;align-items:center;padding:0 9px;border:0;border-radius:5px;background:none;font:inherit;color:inherit;cursor:pointer;white-space:nowrap;}
+.mb-btn:hover{background:rgba(0,0,0,0.06);}
+.mb-btn.open{background:rgba(0,0,0,0.12);}
+.mb-app{font-weight:700;}
+.mb-logo{padding:0 11px;}
+.mb-logo svg{height:13px;width:auto;display:block;fill:currentColor;}
+.mb-drop{position:absolute;top:26px;left:0;min-width:236px;max-height:calc(100vh - 40px);overflow-y:auto;padding:5px;border-radius:10px;z-index:2;
+  background:rgba(246,246,248,0.9);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
+  box-shadow:0 0 0 0.5px rgba(0,0,0,0.16),0 14px 34px -6px rgba(0,0,0,0.32);animation:mbIn .12s ease-out;}
+@keyframes mbIn{from{opacity:0;transform:translateY(-3px);}to{opacity:1;transform:none;}}
+.mb-item{display:block;width:100%;text-align:left;padding:4px 10px;border:0;border-radius:5px;background:none;font:inherit;font-size:13px;line-height:1.35;color:#1d1d1f;cursor:pointer;white-space:nowrap;text-decoration:none;}
+.mb-item:hover,.mb-item:focus-visible{background:#0a7cff;color:#fff;outline:none;}
+.mb-sep{height:1px;margin:5px 10px;background:rgba(0,0,0,0.12);}
+.mb-status{display:flex;align-items:center;gap:7px;padding:0 12px;white-space:nowrap;}
+.mb-dot{width:7px;height:7px;border-radius:50%;background:#28b955;box-shadow:0 0 0 3px rgba(40,185,85,0.2);}
+.mb-clock{padding:0 4px 0 6px;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.mb-city{color:#55555b;}
+.shut{position:fixed;inset:0;z-index:100010;background:#000;color:#f5f5f7;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:15px;letter-spacing:.2px;animation:shutIn .45s ease both;}
+.shut-out{animation:shutOut .7s ease forwards;}
+@keyframes shutIn{from{opacity:0;}to{opacity:1;}}
+@keyframes shutOut{from{opacity:1;}to{opacity:0;}}
+
+/* About This Designer */
+.atd{display:flex;flex-direction:column;align-items:center;text-align:center;min-height:100%;padding:28px 26px 16px;}
+.atd-photo{width:128px;height:128px;flex:0 0 auto;border-radius:50%;background:#ddd url("avatar-dog.jpg") no-repeat center/cover;
+  box-shadow:0 8px 22px rgba(0,0,0,0.22),0 0 0 0.5px rgba(0,0,0,0.2);}
+.atd-name{font-size:24px;font-weight:700;letter-spacing:-0.3px;margin:16px 0 2px;}
+.atd-sub{font-size:13px;color:#6e6e73;margin-bottom:18px;}
+.atd-specs{display:grid;grid-template-columns:auto auto;justify-content:center;gap:5px 12px;margin:0 0 20px;font-size:12.5px;line-height:1.35;text-align:left;}
+.atd-specs dt{font-weight:600;text-align:right;color:#1d1d1f;}
+.atd-specs dd{margin:0;color:#48484d;}
+.atd-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.atd-btn{display:inline-block;padding:5px 14px;border-radius:6px;border:0;font:inherit;font-size:13px;line-height:1.4;color:#1d1d1f;background:#fff;cursor:pointer;text-decoration:none;
+  box-shadow:0 0 0 0.5px rgba(0,0,0,0.2),0 1px 2px rgba(0,0,0,0.08);}
+.atd-btn.primary{background:#0a7cff;color:#fff;box-shadow:none;}
+.atd-foot{margin-top:auto;padding-top:18px;font-size:10.5px;color:#8e8e93;}
+
 /* Welcome notification (macOS style, first visit only) */
-.notif{position:fixed;top:14px;right:14px;z-index:100001;width:384px;max-width:calc(100vw - 28px);display:flex;gap:11px;align-items:flex-start;padding:13px 16px 14px 16px;border-radius:18px;cursor:pointer;color:#1d1d1f;
+.notif{position:fixed;top:38px;right:14px;z-index:100001;width:384px;max-width:calc(100vw - 28px);display:flex;gap:11px;align-items:flex-start;padding:13px 16px 14px 16px;border-radius:18px;cursor:pointer;color:#1d1d1f;
   background:rgba(246,246,248,0.80);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
   box-shadow:0 0 0 0.5px rgba(0,0,0,0.13),0 14px 40px -8px rgba(20,20,40,0.38),0 2px 6px rgba(0,0,0,0.08);}
 .notif-in{animation:notifIn .6s cubic-bezier(.2,.9,.25,1.04) both;}
@@ -2125,7 +2343,7 @@ html,body,#root{height:100%;margin:0;overflow:hidden;}
 .notif:hover .notif-close{opacity:1;}
 @media (hover: none){.notif-close{opacity:1;}}
 @media (max-width: 768px){
-  .notif{top:10px;left:10px;right:10px;width:auto;max-width:none;}
+  .notif{top:38px;left:10px;right:10px;width:auto;max-width:none;}
   .notif-in{animation-name:notifInTop;}.notif-out{animation-name:notifOutTop;}
 }
 @keyframes notifInTop{from{opacity:0;transform:translateY(calc(-100% - 20px));}to{opacity:1;transform:none;}}
@@ -2150,6 +2368,13 @@ html,body,#root{height:100%;margin:0;overflow:hidden;}
   .aboutwin-main p{overflow-wrap:break-word;}
   .about-h1{font-size:clamp(28px,8.4vw,40px);}
   .aboutwin-tab{padding:7px 12px;}
+
+  /* About This Designer on phones: a bit more compact so it fits without scrolling */
+  .atd{padding:20px 16px 12px;}.atd-photo{width:104px;height:104px;}.atd-name{font-size:22px;margin-top:12px;}.atd-sub{margin-bottom:14px;}.atd-specs{font-size:12px;gap:4px 10px;margin-bottom:16px;}
+
+  /* Menu bar on phones: logo, name and clock only */
+  .mb-hide-m{display:none !important;}
+  .mb-btn{padding:0 8px;}
 
   /* Contact: sketch tools wrap instead of overflowing the window */
   .sketch-head{flex-wrap:wrap;row-gap:10px;}
