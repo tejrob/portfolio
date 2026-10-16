@@ -2,25 +2,31 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Ivan Tejada, Creative Lead</title>
-<meta name="description" content="Ivan Tejada, Creative Lead. Portfolio of creative direction, design and social campaigns — selected work for Samsung, Movistar, Peugeot, MediaMarkt and more." />
-<link rel="canonical" href="https://REEMPLAZA-CON-TU-DOMINIO.com/" />
+<meta name="description" content="Ivan Tejada, Creative Lead based in Madrid. Portfolio of creative direction, design and social campaigns. Selected work for Samsung, Movistar, Peugeot, MediaMarkt and more." />
+<link rel="canonical" href="https://ivantejada.com/" />
 <meta name="theme-color" content="#e70e0e" />
 <link rel="icon" type="image/png" href="assets/img_001.png" />
 <link rel="apple-touch-icon" href="assets/img_001.png" />
-<!-- Open Graph (para la previsualización al compartir el enlace). Sube og-image.jpg junto al HTML y cambia el dominio de arriba y de abajo por el tuyo real una vez alojado. -->
+<!-- Open Graph: link preview on LinkedIn, WhatsApp, Slack... -->
+<meta property="og:site_name" content="Ivan Tejada" />
+<meta property="og:locale" content="en_GB" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Ivan Tejada — Creative Lead" />
-<meta property="og:description" content="Ivan Tejada, Creative Lead. Portfolio of creative direction, design and social campaigns — selected work for Samsung, Movistar, Peugeot, MediaMarkt and more." />
-<meta property="og:url" content="https://REEMPLAZA-CON-TU-DOMINIO.com/" />
-<meta property="og:image" content="https://REEMPLAZA-CON-TU-DOMINIO.com/og-image.jpg" />
+<meta property="og:title" content="Ivan Tejada, Creative Lead" />
+<meta property="og:description" content="Ivan Tejada, Creative Lead based in Madrid. Portfolio of creative direction, design and social campaigns. Selected work for Samsung, Movistar, Peugeot, MediaMarkt and more." />
+<meta property="og:url" content="https://ivantejada.com/" />
+<meta property="og:image" content="https://ivantejada.com/og-image.jpg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Ivan Tejada, Creative Lead" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Ivan Tejada — Creative Lead" />
-<meta name="twitter:description" content="Ivan Tejada, Creative Lead. Portfolio of creative direction, design and social campaigns — selected work for Samsung, Movistar, Peugeot, MediaMarkt and more." />
-<meta name="twitter:image" content="https://REEMPLAZA-CON-TU-DOMINIO.com/og-image.jpg" />
+<meta name="twitter:title" content="Ivan Tejada, Creative Lead" />
+<meta name="twitter:description" content="Ivan Tejada, Creative Lead based in Madrid. Portfolio of creative direction, design and social campaigns. Selected work for Samsung, Movistar, Peugeot, MediaMarkt and more." />
+<meta name="twitter:image" content="https://ivantejada.com/og-image.jpg" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Ivan Tejada","jobTitle":"Creative Lead","url":"https://ivantejada.com/","image":"https://ivantejada.com/og-image.jpg","address":{"@type":"PostalAddress","addressLocality":"Madrid","addressCountry":"ES"},"sameAs":["https://www.linkedin.com/in/ivantejadarobles"]}
+</script>
 <style>
   html,body{height:100%;margin:0;background:#f1f1f1;overflow:hidden;}
   #root{height:100%;}
@@ -39,6 +45,7 @@
   <input name="bot-field" />
 </form>
 <div id="boot">Loading…</div>
+<noscript><div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#333;background:#f1f1f1;">This portfolio needs JavaScript to run. You can reach me at tejadarobles@gmail.com</div></noscript>
 <div id="root"></div>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -1177,11 +1184,11 @@ const MINDS = {
     paras: ["Design has always been the fun part.", "I think in images before words. Hand me a half-formed idea and I'll start sketching, moving things around, breaking them apart until they land on a shape that feels right. Graphic design, illustration, motion, to me it's all the same instinct, I don't really separate them.", "Some days that's obsessing over a single frame; other days it's stepping right back to make sure the whole thing still tells one clear story. I like both ends of it. What I'm really chasing is work with a point of view, the kind that feels like a decision and not an accident."]
   },
   atlassian: {
-    title: "Structure Mind",
+    title: "Structured Mind",
     paras: ["Ideas are easy. Landing them is the hard part.", "Over the years I've learned how to walk a good idea all the way to launch, through feedback rounds, timelines, budgets, a dozen markets and as many languages, without letting it lose whatever made it good in the first place.", "That means leading teams, making the calls, keeping everyone rowing in the same direction, and being the last pair of eyes before anything ships. Honestly, I enjoy it: taking a messy, tangled brief and turning it into something clear that a team can actually run with."]
   },
   intel: {
-    title: "Exploration Mind",
+    title: "Exploratory Mind",
     paras: ["I'd rather play with the new tools than be scared of them.", "I bring AI into my work the same way I taught myself everything else, by poking at it until it becomes genuinely useful. Runway, Firefly, Synthesia, Midjourney: they help me explore faster, skip the repetitive grind, and try ten directions before lunch.", "But it's a tool, not the author. The taste, the decisions and the final call stay mine. AI gets me to the good ideas quicker, it doesn't get to make them for me."]
   }
 };
@@ -1220,7 +1227,7 @@ function mediaNode(src, i, imgClass, alt) {
       }));
     })));
   }
-  if (typeof src === "string" && (src.indexOf("data:video/") === 0 || src.slice(-4) === ".mp4")) {
+  if (typeof src === "string" && src.indexOf("duo:") !== 0 && (src.indexOf("data:video/") === 0 || src.slice(-4) === ".mp4")) {
     return /*#__PURE__*/React.createElement("video", { key: i, className: imgClass, src: src, autoPlay: true, loop: true, muted: true, playsInline: true, preload: "auto", ref: playMuted, draggable: false });
   }
   if (src === "gap") {
@@ -1535,11 +1542,11 @@ const DOCK_ITEMS = [{
   kind: "win"
 }, {
   id: "atlassian",
-  label: "Structure Mind",
+  label: "Structured Mind",
   kind: "win"
 }, {
   id: "intel",
-  label: "Exploration Mind",
+  label: "Exploratory Mind",
   kind: "win"
 }, {
   id: "sep1",
@@ -1641,18 +1648,22 @@ function App() {
       const id = "w" + Math.random().toString(36).slice(2, 8);
       const offset = ws.length % 5 * 28;
       const vw = window.innerWidth;
-      const SIDE = 66; /* borde derecho de la barra lateral (solo móvil) */
-      const w = IS_MOBILE ? Math.min(cfg.w || 720, vw - SIDE - 12) : Math.min(cfg.w || 720, vw - 32);
-      const x = IS_MOBILE ? SIDE : Math.max(16, (vw - w) / 2 - 30 + offset);
+      const vh = window.innerHeight;
+      const SIDE = 66; /* right edge of the vertical dock (<=1024px) */
+      const SIDEBAR = vw <= 1024;
+      const w = SIDEBAR ? Math.min(cfg.w || 720, vw - SIDE - 12) : Math.min(cfg.w || 720, vw - 32);
+      const x = SIDEBAR ? SIDE : Math.max(16, (vw - w) / 2 - 30 + offset);
+      const y = 44 + offset;
+      const h = Math.max(260, Math.min(cfg.h || 540, vh - y - (SIDEBAR ? 14 : 116)));
       const nw = {
         id,
         key: cfg.key,
         title: cfg.title,
         render: cfg.render,
         x,
-        y: 44 + offset,
+        y,
         w,
-        h: cfg.h || 540,
+        h,
         z: ++ZSEED,
         max: false,
         min: false,
@@ -1700,7 +1711,7 @@ function App() {
   } : w)), []);
   const openProject = useCallback(p => spawn({
     key: "proj-" + p.id,
-    title: "Information about: " + p.short,
+    title: (IS_MOBILE ? "" : "Information about: ") + p.short,
     w: 900,
     h: 720,
     render: () => /*#__PURE__*/React.createElement(ProjectContent, {
@@ -1751,14 +1762,14 @@ function App() {
     });
     if (item.id === "atlassian") spawn({
       key: "atlassian",
-      title: "Structure Mind",
+      title: "Structured Mind",
       w: 620,
       h: 600,
       render: () => /*#__PURE__*/React.createElement(MindContent, MINDS.atlassian)
     });
     if (item.id === "intel") spawn({
       key: "intel",
-      title: "Exploration Mind",
+      title: "Exploratory Mind",
       w: 620,
       h: 600,
       render: () => /*#__PURE__*/React.createElement(MindContent, MINDS.intel)
@@ -1825,7 +1836,7 @@ const CSS = `
 *{box-sizing:border-box;}
 html,body,#root{height:100%;margin:0;overflow:hidden;}
 .desktop{position:fixed;inset:0;overflow:hidden;
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Inter,sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Inter,"Segoe UI Variable Text","Segoe UI",Roboto,sans-serif;
   -webkit-font-smoothing:antialiased;color:#1d1d1f;user-select:none;}
 
 /* crisp wallpaper (no blur) */
@@ -2031,10 +2042,29 @@ html,body,#root{height:100%;margin:0;overflow:hidden;}
 .dock-tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:rgba(40,40,45,0.94);}
 .dock-item:hover .dock-tip{opacity:1;}
 
+/* Window text can be selected and copied (emails, names, project info) */
+.window-body p,.window-body h1,.window-body h2,.window-body h3,.window-body li,.window-body a,.form-note{-webkit-user-select:text;user-select:text;}
+/* Touch screens: dock labels flash briefly on tap instead of staying stuck over the content */
+@keyframes tipFlash{0%{opacity:1;}70%{opacity:1;}100%{opacity:0;}}
+@media (hover: none){.dock-item:hover .dock-tip{opacity:0;animation:tipFlash 1.6s ease forwards;}}
+
 /* ============================ MOBILE ONLY ============================ */
-@media (max-width: 1024px){.wallpaper{background-image:none !important;background:${MOBILE_BG} !important;background-size:cover !important;background-position:center !important;}/* Dock: barra vertical izquierda en móvil/tablet (≤1024px) */.dock-wrap{left:0;right:auto;bottom:auto;top:50%;transform:translateY(-50%);justify-content:flex-start;}.dock{flex-direction:column;align-items:center;gap:7px;padding:10px 7px;border-radius:19px;margin-left:7px;max-width:none;overflow:visible;}.dock-item{transform:none !important;transition:none !important;transform-origin:left center;}.dock-tile{width:44px;height:44px;border-radius:11px;}.dock-img{width:44px;height:44px;}.dock-sep{width:30px;height:1px;margin:3px 0;align-self:center;}.dock-tip{bottom:auto;top:50%;left:calc(100% + 10px);transform:translateY(-50%);}.dock-tip::after{top:50%;left:auto;right:100%;transform:translateY(-50%);border:5px solid transparent;border-right-color:rgba(40,40,45,0.94);border-top-color:transparent;}}
+@media (max-width: 1024px){.wallpaper{background-image:none !important;background:${MOBILE_BG} !important;background-size:cover !important;background-position:center !important;}/* Dock: barra vertical izquierda en móvil/tablet (≤1024px) */.dock-wrap{left:0;right:auto;bottom:auto;top:50%;transform:translateY(-50%);justify-content:flex-start;}.dock{flex-direction:column;align-items:center;gap:7px;padding:10px 7px;border-radius:19px;margin-left:7px;max-width:none;overflow:visible;}.dock-item{transform:none !important;transition:none !important;transform-origin:left center;}.dock-tile{width:44px;height:44px;border-radius:11px;}.dock-img{width:44px;height:44px;}.dock-sep{width:30px;height:1px;margin:3px 0;align-self:center;}.tl.yellow{display:none !important;}.dock-tip{bottom:auto;top:50%;left:calc(100% + 10px);transform:translateY(-50%);}.dock-tip::after{top:50%;left:auto;right:100%;transform:translateY(-50%);border:5px solid transparent;border-right-color:rgba(40,40,45,0.94);border-top-color:transparent;}}
 
   @media (max-width: 768px){
+  /* About Me en movil: pestanas arriba (horizontal) para que el texto quepa */
+  .aboutwin{flex-direction:column;}
+  .aboutwin-side{flex:0 0 auto;width:100%;flex-direction:row;align-items:center;gap:6px;border-right:0;border-bottom:0.5px solid rgba(0,0,0,0.1);padding:8px 12px;overflow-x:auto;}
+  .aboutwin-side-title{display:none;}
+  .aboutwin-tab{width:auto;padding:7px 14px;white-space:nowrap;}
+  .aboutwin-main p{overflow-wrap:break-word;}
+  .about-h1{font-size:clamp(28px,8.4vw,40px);}
+  .aboutwin-tab{padding:7px 12px;}
+
+  /* Contact: sketch tools wrap instead of overflowing the window */
+  .sketch-head{flex-wrap:wrap;row-gap:10px;}
+  .sketch-tools{flex-wrap:wrap;}
+
   /* Ocultar minimizar en movil (no hay barra para recuperar la ventana) */
   .tl.yellow{display:none !important;}
 
