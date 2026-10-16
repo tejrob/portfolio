@@ -345,11 +345,8 @@ const BANCO = {
 const BIN_PROJECTS = [EUFORIA, CASTROL, DOPAMINE, TEETHTODAY, BANCO];
 
 // w/h vary so icons read like scattered photos/covers of different sizes
-/* ===== MOBILE WALLPAPER PLACEHOLDER =====================================
-   Reemplaza el valor de MOBILE_BG cuando tengas el fondo definitivo.
-   Para una imagen:  const MOBILE_BG = 'url("assets/img_052.jpg") center/cover no-repeat';
-   (de momento es un degradado temporal)                                   */
-const MOBILE_BG = 'url("assets/img_053.jpg") center/cover no-repeat';
+/* Mobile / tablet wallpaper: original full-quality file */
+const MOBILE_BG = 'url("wallpaper-mobile.jpg") center/cover no-repeat';
 const DESKTOP_LAYOUT = [{
   id: "sam-support",
   x: 11,
@@ -1613,6 +1610,67 @@ function Dock({
   })));
 }
 
+/* ---------- WELCOME NOTIFICATION (first visit) ------------------------- */
+const WELCOME_KEY = "it_welcome_v1";
+function Welcome({
+  busy,
+  onOpen
+}) {
+  const [state, setState] = useState("hidden"); /* hidden | in | out */
+  const timer = useRef(null);
+  const touch = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(hover: none)").matches;
+  const sideBar = typeof window !== "undefined" && window.innerWidth <= 1024;
+  const hide = useCallback(() => {
+    clearTimeout(timer.current);
+    setState(s => s === "in" ? "out" : s);
+    try { localStorage.setItem(WELCOME_KEY, "1"); } catch (e) {}
+  }, []);
+  const arm = useCallback(ms => {
+    clearTimeout(timer.current);
+    timer.current = setTimeout(hide, ms);
+  }, [hide]);
+  useEffect(() => {
+    let force = !!window.__FORCE_WELCOME;
+    try { force = force || /[?&#]welcome\b/.test(location.search + location.hash); } catch (e) {}
+    let seen = false;
+    try { seen = localStorage.getItem(WELCOME_KEY) === "1"; } catch (e) {}
+    if (seen && !force) return;
+    const t = setTimeout(() => setState("in"), 1400);
+    return () => clearTimeout(t);
+  }, []);
+  useEffect(() => {
+    if (state === "in") arm(11000);
+    return () => clearTimeout(timer.current);
+  }, [state, arm]);
+  useEffect(() => {
+    if (busy && state === "in") hide();
+  }, [busy, state, hide]);
+  if (state === "hidden" || state === "done") return null;
+  const verb = touch ? "Tap" : "Click";
+  const where = sideBar ? "on the left" : "at the bottom";
+  return /*#__PURE__*/React.createElement("div", {
+    className: "notif " + (state === "in" ? "notif-in" : "notif-out"),
+    role: "status",
+    "aria-live": "polite",
+    onMouseEnter: () => clearTimeout(timer.current),
+    onMouseLeave: () => state === "in" && arm(5000),
+    onAnimationEnd: () => state === "out" && setState("done"),
+    onClick: () => { hide(); onOpen(); }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "notif-close",
+    "aria-label": "Dismiss",
+    onClick: e => { e.stopPropagation(); hide(); }
+  }, "×"), /*#__PURE__*/React.createElement("div", {
+    className: "notif-body"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "notif-head"
+  }, /*#__PURE__*/React.createElement("span", null, "IVAN TEJADA"), /*#__PURE__*/React.createElement("span", null, "now")), /*#__PURE__*/React.createElement("div", {
+    className: "notif-title"
+  }, "Hi, I’m Ivan. Make yourself at home."), /*#__PURE__*/React.createElement("div", {
+    className: "notif-text"
+  }, verb + " any image to see the project. To learn more about me or get in touch, use the icons " + where + ".")));
+}
+
 /* ---------- APP ----------------------------------------------------------- */
 
 let ZSEED = 100;
@@ -1827,6 +1885,12 @@ function App() {
     onResize: resize
   }, w.render())), /*#__PURE__*/React.createElement(Dock, {
     onAction: onDockAction
+  }), /*#__PURE__*/React.createElement(Welcome, {
+    busy: wins.length > 0,
+    onOpen: () => onDockAction({
+      id: "about",
+      kind: "win"
+    })
   })));
 }
 
@@ -1854,7 +1918,9 @@ html,body,#root{height:100%;margin:0;overflow:hidden;}
 .cover-frame{position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.28),inset 0 0 0 1.5px rgba(255,255,255,0.06);}
 .cover-vignette{position:absolute;inset:0;border-radius:inherit;background:radial-gradient(120% 120% at 50% 30%,transparent 45%,rgba(0,0,0,0.32) 100%);}
 .cover-grain{position:absolute;inset:0;border-radius:inherit;opacity:0.16;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
-.desk-label{display:inline-block;font-size:11px;font-weight:700;line-height:1.3;text-align:center;letter-spacing:.3px;text-transform:uppercase;padding:2px 7px;border-radius:6px;color:#fff;max-width:160px;white-space:normal;overflow-wrap:normal;word-break:normal;hyphens:none;text-shadow:0 1px 4px rgba(0,0,0,0.6),0 0 2px rgba(0,0,0,0.5);}
+.desk-label{display:inline-block;font-size:11px;font-weight:700;line-height:1.3;text-align:center;letter-spacing:.3px;text-transform:uppercase;padding:3px 8px;border-radius:7px;color:#fff;max-width:160px;white-space:normal;overflow-wrap:normal;word-break:normal;hyphens:none;
+  background:rgba(30,30,34,0.38);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 0 0 0.5px rgba(255,255,255,0.18),0 2px 8px rgba(0,0,0,0.12);text-shadow:0 1px 2px rgba(0,0,0,0.4);transition:background .15s ease;}
 
 /* windows */
 .window{position:absolute;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;background:rgba(252,252,253,0.86);backdrop-filter:blur(34px) saturate(185%);-webkit-backdrop-filter:blur(34px) saturate(185%);box-shadow:0 1px 1px rgba(0,0,0,0.04),0 22px 42px -12px rgba(20,20,50,0.4),0 48px 90px -20px rgba(20,20,50,0.34),0 0 0 0.5px rgba(0,0,0,0.14);transition:box-shadow .25s ease;}
@@ -2041,6 +2107,30 @@ html,body,#root{height:100%;margin:0;overflow:hidden;}
 .dock-tip{position:absolute;bottom:calc(100% + 13px);left:50%;transform:translateX(-50%);background:rgba(40,40,45,0.94);color:#fff;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s ease;}
 .dock-tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:rgba(40,40,45,0.94);}
 .dock-item:hover .dock-tip{opacity:1;}
+
+/* Welcome notification (macOS style, first visit only) */
+.notif{position:fixed;top:14px;right:14px;z-index:100001;width:384px;max-width:calc(100vw - 28px);display:flex;gap:11px;align-items:flex-start;padding:13px 16px 14px 16px;border-radius:18px;cursor:pointer;color:#1d1d1f;
+  background:rgba(246,246,248,0.80);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
+  box-shadow:0 0 0 0.5px rgba(0,0,0,0.13),0 14px 40px -8px rgba(20,20,40,0.38),0 2px 6px rgba(0,0,0,0.08);}
+.notif-in{animation:notifIn .6s cubic-bezier(.2,.9,.25,1.04) both;}
+.notif-out{animation:notifOut .32s ease forwards;}
+@keyframes notifIn{from{opacity:0;transform:translateX(calc(100% + 30px));}to{opacity:1;transform:none;}}
+@keyframes notifOut{from{opacity:1;transform:none;}to{opacity:0;transform:translateX(calc(100% + 30px));}}
+.notif-body{min-width:0;flex:1;}
+.notif-head{display:flex;justify-content:space-between;font-size:11px;font-weight:600;letter-spacing:.3px;color:#6e6e73;margin-bottom:3px;}
+.notif-title{font-size:13.5px;font-weight:700;line-height:1.3;}
+.notif-text{font-size:13px;line-height:1.4;color:#3a3a3c;margin-top:2px;text-wrap:pretty;}
+.notif-close{position:absolute;top:-7px;left:-7px;width:22px;height:22px;border-radius:50%;border:0;padding:0;cursor:pointer;font-size:14px;line-height:22px;color:#444;
+  background:rgba(250,250,252,0.96);box-shadow:0 0 0 0.5px rgba(0,0,0,0.2),0 2px 6px rgba(0,0,0,0.16);opacity:0;transition:opacity .15s ease;}
+.notif:hover .notif-close{opacity:1;}
+@media (hover: none){.notif-close{opacity:1;}}
+@media (max-width: 768px){
+  .notif{top:10px;left:10px;right:10px;width:auto;max-width:none;}
+  .notif-in{animation-name:notifInTop;}.notif-out{animation-name:notifOutTop;}
+}
+@keyframes notifInTop{from{opacity:0;transform:translateY(calc(-100% - 20px));}to{opacity:1;transform:none;}}
+@keyframes notifOutTop{from{opacity:1;transform:none;}to{opacity:0;transform:translateY(calc(-100% - 20px));}}
+@media (prefers-reduced-motion: reduce){.notif-in,.notif-out{animation-duration:.01s;}}
 
 /* Window text can be selected and copied (emails, names, project info) */
 .window-body p,.window-body h1,.window-body h2,.window-body h3,.window-body li,.window-body a,.form-note{-webkit-user-select:text;user-select:text;}
