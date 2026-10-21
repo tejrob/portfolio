@@ -1023,9 +1023,18 @@ function ContactContent() {
     className: "contact-h1"
   }, "Let's work together."), /*#__PURE__*/React.createElement("p", {
     className: "contact-lead"
-  }, "If you have a project, a brief, or a brand that needs strong creative direction, I'd like to hear about it."), /*#__PURE__*/React.createElement("p", {
+  }, "If you have a project, a brief, or a brand that needs strong creative direction, I'd like to hear about it."), /*#__PURE__*/React.createElement("div", {
+    className: "contact-quick"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "linkedin-btn compact",
+    href: "https://www.linkedin.com/in/ivantejadarobles/",
+    target: "_blank",
+    rel: "noreferrer"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "li-badge"
+  }, "in"), /*#__PURE__*/React.createElement("span", null, "Connect on LinkedIn"))), /*#__PURE__*/React.createElement("p", {
     className: "contact-sub"
-  }, "This space is also yours. Feel free to leave a small sketch alongside your message."), /*#__PURE__*/React.createElement(SketchPad, {
+  }, "Or send me a message below. This space is also yours. Feel free to leave a small sketch alongside your message."), /*#__PURE__*/React.createElement(SketchPad, {
     canvasRef: canvasRef
   }), /*#__PURE__*/React.createElement("div", {
     className: "form"
@@ -1074,18 +1083,7 @@ function ContactContent() {
     disabled: status === "sending"
   }, status === "sending" ? "Sending\u2026" : status === "sent" ? "Sent \u2713" : "Get in touch"), invalid && /*#__PURE__*/React.createElement("p", {
     className: "form-note err"
-  }, "Please add your name and email so I can reply."), status === "sent" && /*#__PURE__*/React.createElement("p", { className: "form-note ok" }, "Thanks! Your message is on its way, doodle included. I\u2019ll reply soon."), status === "error" && /*#__PURE__*/React.createElement("p", { className: "form-note err" }, "Something went wrong. Please email me directly at tejadarobles@gmail.com.")), /*#__PURE__*/React.createElement("div", {
-    className: "contact-outro"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "contact-outro-text"
-  }, "Prefer LinkedIn?"), /*#__PURE__*/React.createElement("a", {
-    className: "linkedin-btn",
-    href: "https://www.linkedin.com/in/ivantejadarobles/",
-    target: "_blank",
-    rel: "noreferrer"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "li-badge"
-  }, "in"), /*#__PURE__*/React.createElement("span", null, "Connect on LinkedIn"))));
+  }, "Please add your name and email so I can reply."), status === "sent" && /*#__PURE__*/React.createElement("p", { className: "form-note ok" }, "Thanks! Your message is on its way, doodle included. I\u2019ll reply soon."), status === "error" && /*#__PURE__*/React.createElement("p", { className: "form-note err" }, "Something went wrong. Please email me directly at tejadarobles@gmail.com.")));
 }
 function WorkContent({
   onOpen
@@ -1611,7 +1609,7 @@ function Dock({
 }
 
 /* ---------- MENU BAR (macOS style) -------------------------------------- */
-const STATUS_TEXT = "Open to new projects"; /* leave "" to hide the status */
+const STATUS_TEXT = ""; /* e.g. "Open to new projects"; empty hides it */
 const IT_MARK = /*#__PURE__*/React.createElement("svg", {
   viewBox: "0 0 174 256",
   "aria-hidden": "true"
@@ -1665,16 +1663,6 @@ function MenuBar({
     logo: true,
     items: [{ label: "About This Designer", run: onAboutDesigner }, { sep: true }, { label: "Shut Down…", run: shutDown }]
   }, {
-    id: "app",
-    label: "Ivan Tejada",
-    app: true,
-    items: [{ label: "About Me", run: () => onDock("about") }, { sep: true }, { label: "Creative Mind", run: () => onDock("adobe") }, { label: "Structured Mind", run: () => onDock("atlassian") }, { label: "Exploratory Mind", run: () => onDock("intel") }]
-  }, {
-    id: "work",
-    label: "Work",
-    hideMobile: true,
-    items: [{ label: "All Work", run: () => onDock("work") }, { sep: true }].concat(projects.slice().sort((a, b) => a.short.localeCompare(b.short, "en", { sensitivity: "base", ignorePunctuation: true })).map(p => ({ label: p.short, run: () => onProject(p) }))).concat([{ sep: true }, { label: "Ideas Folder", run: () => onDock("bin") }])
-  }, {
     id: "contact",
     label: "Contact",
     hideMobile: true,
@@ -1683,7 +1671,7 @@ function MenuBar({
     id: "help",
     label: "Help",
     hideMobile: true,
-    items: [{ label: "Show Welcome Tip", run: onWelcome }, { sep: true }, { label: "Report a Bug…", run: () => onDock("error") }]
+    items: [{ label: "Show Welcome Tip", run: onWelcome }]
   }];
   const item = (it, i) => {
     if (it.sep) return /*#__PURE__*/React.createElement("div", { key: i, className: "mb-sep" });
@@ -2200,7 +2188,10 @@ html,body,#root{height:100%;margin:0;overflow:hidden;}
 /* Contact */
 .contact-doc{padding:44px 48px 48px;max-width:540px;}
 .contact-h1{font-family:"New York",Georgia,serif;font-size:32px;font-weight:600;letter-spacing:-0.4px;margin:0 0 14px;color:#161617;}
-.contact-lead{font-size:16px;line-height:1.65;color:#3d3d40;margin:0 0 26px;}
+.contact-lead{font-size:16px;line-height:1.65;color:#3d3d40;margin:0 0 20px;}
+.contact-quick{margin:0 0 22px;}
+.linkedin-btn.compact{font-size:14px;gap:9px;padding:8px 16px 8px 9px;border-radius:11px;box-shadow:0 6px 16px rgba(10,102,194,0.28);}
+.linkedin-btn.compact .li-badge{width:22px;height:22px;border-radius:6px;font-size:12.5px;}
 .contact-sub{font-size:14.5px;line-height:1.6;color:#86868b;margin:0 0 12px;}
 .contact-sent{display:flex;flex-direction:column;align-items:flex-start;gap:6px;justify-content:center;}
 .sent-check{width:54px;height:54px;border-radius:50%;background:#28c840;color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 8px 20px rgba(40,200,64,0.34);}
