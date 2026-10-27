@@ -496,7 +496,7 @@ const DESKTOP_LAYOUT_MOBILE = [{
   w: 66,
   h: 66
 }];
-const IS_MOBILE = typeof window !== "undefined" && window.innerWidth <= 768;
+const IS_MOBILE = typeof window !== "undefined" && (!!window.__FORCE_PHONE || window.innerWidth <= 768);
 const LAYOUT = IS_MOBILE ? DESKTOP_LAYOUT_MOBILE : DESKTOP_LAYOUT;
 
 /* ---------- COVER-ART THUMBNAIL ------------------------------------------ */
@@ -1750,6 +1750,7 @@ const WELCOME_KEY = "it_welcome_v1";
 function Welcome({
   busy,
   replay,
+  ready = true,
   onOpen
 }) {
   const [state, setState] = useState("hidden"); /* hidden | in | out */
@@ -1766,16 +1767,20 @@ function Welcome({
     timer.current = setTimeout(hide, ms);
   }, [hide]);
   useEffect(() => {
+    if (!ready) return;
     let force = !!window.__FORCE_WELCOME;
     try { force = force || /[?&#]welcome\b/.test(location.search + location.hash); } catch (e) {}
     let seen = false;
     try { seen = localStorage.getItem(WELCOME_KEY) === "1"; } catch (e) {}
     if (seen && !force) return;
-    const t = setTimeout(() => setState("in"), 1400);
+    const t = setTimeout(() => setState("in"), 900);
     return () => clearTimeout(t);
-  }, []);
+  }, [ready]);
   useEffect(() => {
-    if (state === "in") arm(11000);
+    if (state === "in") {
+      arm(11000);
+      try { localStorage.setItem(WELCOME_KEY, "1"); } catch (e) {}
+    }
     return () => clearTimeout(timer.current);
   }, [state, arm]);
   const stateRef = useRef(state);
@@ -1812,6 +1817,309 @@ function Welcome({
   }, "Hi, I’m Ivan. Make yourself at home."), /*#__PURE__*/React.createElement("div", {
     className: "notif-text"
   }, verb + " any image to see the project. To learn more about me or get in touch, use the icons " + where + ".")));
+}
+
+/* ---------- iPHONE VERSION (phones only, <=768px) ------------------------ */
+const LOCK_KEY = "it_lock_v1";
+const ph = React.createElement;
+const PH_ICON = id => ICONS[IMG_MAP[id]];
+const PH_APPS = {
+  adobe: { label: "Creative", title: "Creative Mind" },
+  atlassian: { label: "Structured", title: "Structured Mind" },
+  intel: { label: "Exploratory", title: "Exploratory Mind" },
+  settings: { label: "Settings", title: "About" },
+  error: { label: "Error" },
+  work: { label: "Work", title: "" },
+  about: { label: "About Me", title: "About Me" },
+  bin: { label: "Ideas Folder" },
+  contact: { label: "Contact", title: "Contact" }
+};
+const PH_HOME = ["adobe", "atlassian", "intel", "settings", "error"];
+const PH_DOCK = ["work", "about", "bin", "contact"];
+function phIsImg(s) {
+  return typeof s === "string" && (s.indexOf("data:image/") === 0 || /\.(jpe?g|png|gif|webp)$/i.test(s));
+}
+function phThumbStyle(p) {
+  const src = phIsImg(p.img) ? p.img : (p.media || []).find(phIsImg);
+  return src ? { backgroundImage: "url(" + src + ")" } : { background: p.cover };
+}
+const PH_SETTINGS_SVG = ph("svg", {
+  viewBox: "0 0 60 60",
+  "aria-hidden": "true"
+}, ph("defs", null, ph("linearGradient", { id: "phSetBg", x1: 0, y1: 0, x2: 0, y2: 1 }, ph("stop", { offset: 0, stopColor: "#c3c6cc" }), ph("stop", { offset: 1, stopColor: "#868a93" }))), ph("rect", { width: 60, height: 60, fill: "url(#phSetBg)" }), ph("g", {
+  transform: "translate(30 30)",
+  fill: "#3c3f45"
+}, Array.from({ length: 12 }, (_, i) => ph("rect", { key: i, x: -2.7, y: -21, width: 5.4, height: 8, rx: 1.4, transform: "rotate(" + i * 30 + ")" })), ph("circle", { r: 15.6 })), ph("circle", { cx: 30, cy: 30, r: 10.6, fill: "#cfd2d7" }), ph("circle", { cx: 30, cy: 30, r: 5.2, fill: "#3c3f45" }));
+const PH_DOODLE_SVG = ph("svg", {
+  viewBox: "0 0 60 60",
+  "aria-hidden": "true"
+}, ph("defs", null, ph("linearGradient", { id: "phDoodBg", x1: 0, y1: 0, x2: 1, y2: 1 }, ph("stop", { offset: 0, stopColor: "#ffb340" }), ph("stop", { offset: 1, stopColor: "#ff6a1a" }))), ph("rect", { width: 60, height: 60, fill: "url(#phDoodBg)" }), ph("path", { d: "M13 39c5-15 10 5 15-8s9-9 11 1 6 3 8-6", fill: "none", stroke: "#fff", strokeWidth: 4.2, strokeLinecap: "round", strokeLinejoin: "round" }), ph("circle", { cx: 45, cy: 17, r: 3.4, fill: "#fff" }));
+const PH_FREE_SVG = ph("svg", {
+  viewBox: "0 0 60 60",
+  "aria-hidden": "true"
+}, ph("defs", null, ph("linearGradient", { id: "phFreeBg", x1: 0, y1: 0, x2: 1, y2: 1 }, ph("stop", { offset: 0, stopColor: "#4cd964" }), ph("stop", { offset: 1, stopColor: "#16a34a" }))), ph("rect", { width: 60, height: 60, fill: "url(#phFreeBg)" }), ph("rect", { x: 15, y: 28, width: 30, height: 18, rx: 3, fill: "#fff" }), ph("rect", { x: 13, y: 21, width: 34, height: 9, rx: 2.5, fill: "#fff" }), ph("rect", { x: 27.6, y: 21, width: 4.8, height: 25, fill: "#16a34a" }), ph("path", { d: "M30 21c-3-7-11-7-10-2 1 3 6 2 10 2zm0 0c3-7 11-7 10-2-1 3-6 2-10 2z", fill: "#fff" }));
+const PH_SEARCH_SVG = ph("svg", {
+  viewBox: "0 0 20 20",
+  "aria-hidden": "true"
+}, ph("circle", { cx: 8.5, cy: 8.5, r: 5.8, fill: "none", stroke: "currentColor", strokeWidth: 2.2 }), ph("path", { d: "M13 13l4.5 4.5", stroke: "currentColor", strokeWidth: 2.2, strokeLinecap: "round" }));
+const PH_CHEVRON = ph("svg", {
+  viewBox: "0 0 12 20",
+  "aria-hidden": "true"
+}, ph("path", { d: "M10 2L2 10l8 8", fill: "none", stroke: "currentColor", strokeWidth: 2.6, strokeLinecap: "round", strokeLinejoin: "round" }));
+function PhGlyph({
+  id
+}) {
+  if (id === "settings") return PH_SETTINGS_SVG;
+  if (id === "doodles") return PH_DOODLE_SVG;
+  if (id === "free") return PH_FREE_SVG;
+  return ph("img", { src: PH_ICON(id), alt: "", draggable: false });
+}
+function PhFolderIcon() {
+  const minis = BIN_PROJECTS.map(p => ph("span", { key: p.id, className: "ph-mini", style: phThumbStyle(p) }));
+  minis.push(ph("span", { key: "d", className: "ph-mini" }, PH_DOODLE_SVG), ph("span", { key: "f", className: "ph-mini" }, PH_FREE_SVG));
+  return ph("span", { className: "ph-ico ph-folder-ico" }, minis);
+}
+function PhIcon({
+  id,
+  onOpen
+}) {
+  const a = PH_APPS[id] || {};
+  return ph("button", {
+    className: "ph-app",
+    onClick: e => onOpen(id, e.currentTarget.querySelector(".ph-ico"))
+  }, id === "bin" ? ph(PhFolderIcon) : ph("span", {
+    className: "ph-ico" + (id === "error" ? " ph-ico-error" : "")
+  }, ph(PhGlyph, { id })), ph("span", { className: "ph-label" }, a.label));
+}
+function phDate() {
+  try {
+    return new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Madrid", weekday: "long", day: "numeric", month: "long" }).format(new Date());
+  } catch (e) {
+    return new Date().toDateString();
+  }
+}
+function PhLock({
+  onUnlock,
+  leaving
+}) {
+  const clock = useMadridClock();
+  return ph("div", {
+    className: "ph-lock" + (leaving ? " ph-lock-out" : ""),
+    onClick: onUnlock,
+    role: "button",
+    tabIndex: 0,
+    "aria-label": "Tap to open",
+    onKeyDown: e => { if (e.key === "Enter" || e.key === " ") onUnlock(); }
+  }, ph("div", { className: "wallpaper" }), ph("div", {
+    className: "ph-lock-head"
+  }, ph("svg", { className: "ph-lock-pad", viewBox: "0 0 24 24", "aria-hidden": "true" }, ph("path", { d: "M7.5 10.5V7.8a4.5 4.5 0 0 1 9 0v2.7", fill: "none", stroke: "currentColor", strokeWidth: 2.2, strokeLinecap: "round" }), ph("rect", { x: 5, y: 10.5, width: 14, height: 10.5, rx: 2.6, fill: "currentColor" })), ph("div", { className: "ph-lock-date" }, phDate() + " \u00B7 Madrid"), ph("div", { className: "ph-lock-time" }, clock.time)), ph("div", {
+    className: "ph-lock-notif"
+  }, ph("div", { className: "notif-head" }, ph("span", null, "IVAN TEJADA"), ph("span", null, "now")), ph("div", { className: "notif-title" }, "Hi, I’m Ivan. Make yourself at home."), ph("div", { className: "notif-text" }, "Open Work to see my projects. To learn more about me or get in touch, use the apps on the home screen.")), ph("div", {
+    className: "ph-lock-foot"
+  }, ph("span", { className: "ph-lock-btn" }, ph("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, ph("path", { d: "M8.5 2.5h7v3.2l-1.6 3v11.3a1.4 1.4 0 0 1-1.4 1.5h-1a1.4 1.4 0 0 1-1.4-1.5V8.7l-1.6-3z", fill: "currentColor" }))), ph("span", { className: "ph-lock-hint" }, "Tap anywhere to open"), ph("span", { className: "ph-lock-btn" }, ph("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, ph("path", { d: "M8.2 6.5l1.4-2.2h4.8l1.4 2.2H19a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8.5a2 2 0 0 1 2-2z", fill: "currentColor" }), ph("circle", { cx: 12, cy: 13, r: 3.6, fill: "#2a2a2e" })))), ph("span", { className: "ph-homeind" }));
+}
+function PhWork({
+  onOpen
+}) {
+  return ph("div", {
+    className: "ph-work"
+  }, ph("h1", { className: "ph-large" }, "My Work"), ph("p", { className: "ph-work-sub" }, PROJECTS.length + " projects"), ph("div", {
+    className: "ph-work-grid"
+  }, PROJECTS.map(p => ph("button", {
+    key: p.id,
+    className: "ph-work-item",
+    onClick: () => onOpen(p)
+  }, ph("span", { className: "ph-work-thumb", style: phThumbStyle(p) }), ph("span", { className: "ph-work-name" }, p.short), p.meta && ph("span", { className: "ph-work-meta" }, p.meta)))));
+}
+function PhSettings() {
+  const rows = [["Memory", "64 GB of references"], ["Graphics", "Pixel-perfect, mostly"], ["Startup Disk", "Coffee and a deadline"], ["Compatibility", "Works with teams of any size"], ["Software Update", "Learning every day"]];
+  return ph("div", {
+    className: "ph-set"
+  }, ph("div", { className: "ph-set-card" }, ph("div", { className: "ph-set-avatar", role: "img", "aria-label": "Ivan Tejada's avatar" }), ph("div", { className: "ph-set-name" }, "Ivan Tejada"), ph("div", { className: "ph-set-sub" }, "Creative Lead, Madrid")), ph("div", {
+    className: "ph-set-group"
+  }, rows.map(r => ph("div", { key: r[0], className: "ph-set-row" }, ph("span", { className: "ph-set-k" }, r[0]), ph("span", { className: "ph-set-v" }, r[1])))), ph("div", {
+    className: "ph-set-group"
+  }, ph("a", { className: "ph-set-row ph-set-link", href: CV_PDF, download: "Ivan_Tejada_CV_EN.pdf" }, "Download CV")), ph("p", { className: "ph-set-foot" }, "™ and © " + new Date().getFullYear() + " Ivan Tejada. All ideas reserved."));
+}
+function PhAlert({
+  onClose
+}) {
+  return ph("div", {
+    className: "ph-alert-ov",
+    onClick: onClose
+  }, ph("div", {
+    className: "ph-alert",
+    role: "alertdialog",
+    "aria-label": "Error",
+    onClick: e => e.stopPropagation()
+  }, ph("div", { className: "ph-alert-body" }, ph("img", { className: "ph-alert-ico", src: PH_ICON("error"), alt: "" }), ph("div", { className: "ph-alert-title" }, "ERROR_418 \xB7 Creativity overflow"), ph("p", { className: "ph-alert-text" }, "Too many ideas, not enough hours in the day. This button does absolutely nothing, and it does it beautifully. ✦")), ph("button", { className: "ph-alert-btn", onClick: onClose }, "OK, fair enough")));
+}
+function PhFolder({
+  onClose,
+  onPick
+}) {
+  const app = (key, icon, label, page) => ph("button", {
+    key,
+    className: "ph-app",
+    onClick: e => { e.stopPropagation(); onPick(page, e.currentTarget.querySelector(".ph-ico")); }
+  }, icon, ph("span", { className: "ph-label" }, label));
+  return ph("div", {
+    className: "ph-folder-ov",
+    onClick: onClose
+  }, ph("div", { className: "ph-folder-title" }, "Ideas Folder"), ph("div", { className: "ph-folder-sub" }, "A drawer of smaller projects, side work, doodles and free downloads. \u2726"), ph("div", {
+    className: "ph-folder-panel",
+    onClick: e => e.stopPropagation()
+  }, BIN_PROJECTS.map(p => app(p.id, ph("span", { className: "ph-ico ph-ico-cover", style: phThumbStyle(p) }), p.short, { kind: "project", p })), app("doodles", ph("span", { className: "ph-ico" }, PH_DOODLE_SVG), "Doodles", { kind: "art" }), app("free", ph("span", { className: "ph-ico" }, PH_FREE_SVG), "Free Stuff", { kind: "free" })));
+}
+function PhSearch({
+  onClose,
+  onApp,
+  onPage
+}) {
+  const [q, setQ] = useState("");
+  const norm = s => (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const nq = norm(q.trim());
+  const match = (...fields) => !nq || fields.some(f => norm(Array.isArray(f) ? f.join(" ") : f).indexOf(nq) !== -1);
+  const apps = ["about", "contact", "work", "adobe", "atlassian", "intel", "settings"].filter(id => match(PH_APPS[id].title || PH_APPS[id].label, PH_APPS[id].label));
+  const projects = PROJECTS.concat(BIN_PROJECTS).filter(p => match(p.short, p.meta, p.tags, p.label));
+  const row = (key, icon, title, meta, onClick) => ph("button", { key, className: "ph-search-row", onClick }, ph("span", { className: "ph-search-ico", style: icon.style }, icon.node), ph("span", null, ph("span", { className: "ph-search-t" }, title), meta && ph("span", { className: "ph-search-m" }, meta)));
+  return ph("div", {
+    className: "ph-search-ov"
+  }, ph("div", { className: "ph-search-bar" }, ph("label", { className: "ph-search-field" }, PH_SEARCH_SVG, ph("input", { type: "search", placeholder: "Search projects, brands…", value: q, autoFocus: true, onChange: e => setQ(e.target.value) })), ph("button", { className: "ph-search-cancel", onClick: onClose }, "Cancel")), ph("div", {
+    className: "ph-search-list"
+  }, projects.length > 0 && ph(React.Fragment, null, ph("div", { className: "ph-search-h" }, "Projects"), ph("div", { className: "ph-search-group" }, projects.map(p => row(p.id, { style: phThumbStyle(p) }, p.short, p.meta, e => onPage({ kind: "project", p }, e.currentTarget.querySelector(".ph-search-ico")))))), apps.length > 0 && ph(React.Fragment, null, ph("div", { className: "ph-search-h" }, "Apps"), ph("div", { className: "ph-search-group" }, apps.map(id => row(id, { node: id === "bin" ? null : ph(PhGlyph, { id }) }, PH_APPS[id].title || PH_APPS[id].label, null, e => onApp(id, e.currentTarget.querySelector(".ph-search-ico")))))), !projects.length && !apps.length && ph("p", { className: "ph-search-empty" }, "No results for “" + q + "”")));
+}
+function phPageTitle(page) {
+  if (page.kind === "project") return page.p.short;
+  if (page.kind === "art") return "Doodles";
+  if (page.kind === "free") return "Free Stuff";
+  return "";
+}
+function PhView({
+  view,
+  onBack,
+  onClose,
+  onPush
+}) {
+  const page = view.stack[view.stack.length - 1];
+  const rootTitle = view.id === "page" ? phPageTitle(view.root) : view.id === "work" ? "My Work" : (PH_APPS[view.id] || {}).title || "";
+  const pageNode = pg => pg.kind === "project" ? ph(ProjectContent, { project: pg.p }) : pg.kind === "art" ? ph(ArtContent) : pg.kind === "free" ? ph(FreeStuff) : null;
+  let body;
+  if (page) body = pageNode(page);
+  else if (view.id === "page") body = pageNode(view.root);
+  else if (view.id === "about") body = ph(AboutWindow);
+  else if (view.id === "contact") body = ph(ContactContent);
+  else if (view.id === "work") body = ph(PhWork, { onOpen: p => onPush({ kind: "project", p }) });
+  else if (view.id === "settings") body = ph(PhSettings);
+  else if (MINDS[view.id]) body = ph(MindContent, MINDS[view.id]);
+  const title = page ? phPageTitle(page) : view.id === "work" ? "" : rootTitle;
+  const backLabel = page ? rootTitle : "Home";
+  return ph("div", {
+    className: "ph-view" + (view.id === "settings" && !page ? " ph-view-grey" : "") + (view.closing ? " ph-view-out" : ""),
+    style: { transformOrigin: view.ox + "px " + view.oy + "px" }
+  }, ph("div", {
+    className: "ph-nav"
+  }, ph("button", { className: "ph-back", onClick: onBack }, PH_CHEVRON, ph("span", null, backLabel)), ph("div", { className: "ph-nav-title" }, title), ph("span", null)), ph("div", {
+    key: view.stack.length + ":" + (view.dir || ""),
+    className: "ph-body" + (view.dir === "fwd" ? " ph-push" : view.dir === "back" ? " ph-pop" : "") + (view.id === "about" && !page ? " ph-body-fill" : "")
+  }, body), ph("button", { className: "ph-homebar", "aria-label": "Close", onClick: onClose }, ph("span")));
+}
+function PhoneApp() {
+  const [locked, setLocked] = useState(true); /* lock screen on every visit */
+  const [unlocking, setUnlocking] = useState(false);
+  const [view, setView] = useState(null);
+  const [folder, setFolder] = useState(false);
+  const [alert, setAlert] = useState(false);
+  const [search, setSearch] = useState(false);
+  const startedLocked = useRef(locked);
+  const unlock = () => {
+    if (unlocking) return;
+    setUnlocking(true);
+    try { localStorage.setItem(LOCK_KEY, "1"); localStorage.setItem(WELCOME_KEY, "1"); } catch (e) {}
+    setTimeout(() => { setLocked(false); setUnlocking(false); }, 520);
+  };
+  const originOf = el => {
+    /* coordinates relative to the phone screen (works full screen and inside a scaled preview) */
+    const host = document.querySelector(".ph");
+    const hr = host ? host.getBoundingClientRect() : { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
+    const s = host && host.offsetWidth ? hr.width / host.offsetWidth : 1;
+    if (!el) return { ox: hr.width / s / 2, oy: hr.height / s / 2 };
+    const r = el.getBoundingClientRect();
+    return { ox: (r.left - hr.left + r.width / 2) / s, oy: (r.top - hr.top + r.height / 2) / s };
+  };
+  const openApp = (id, el) => {
+    if (id === "error") { setAlert(true); return; }
+    if (id === "bin") { setFolder(true); return; }
+    setSearch(false);
+    setView({ id, stack: [], ...originOf(el) });
+  };
+  const openPage = (page, el) => {
+    setFolder(false);
+    setSearch(false);
+    setView({ id: "page", root: page, stack: [], ...originOf(el) });
+  };
+  const closeView = () => {
+    setView(v => v && { ...v, closing: true });
+    setTimeout(() => setView(null), 300);
+  };
+  const push = page => setView(v => v && { ...v, stack: v.stack.concat([page]), dir: "fwd" });
+  const back = () => {
+    if (view && view.stack.length) setView(v => ({ ...v, stack: v.stack.slice(0, -1), dir: "back" }));
+    else closeView();
+  };
+  const homeCls = locked && !unlocking ? " ph-home-hidden" : (startedLocked.current || !locked) ? " ph-home-enter" : "";
+  return ph(React.Fragment, null, ph("style", null, CSS), ph("div", {
+    className: "ph"
+  }, ph("div", { className: "wallpaper" }), ph("div", { className: "ph-veil" }), ph("div", {
+    className: "ph-home" + homeCls,
+    "aria-hidden": locked && !unlocking ? "true" : undefined
+  }, ph("div", { className: "ph-grid" }, PH_HOME.map(id => ph(PhIcon, { key: id, id, onOpen: openApp }))), ph("button", {
+    className: "ph-searchpill",
+    onClick: () => setSearch(true)
+  }, PH_SEARCH_SVG, "Search"), ph("div", { className: "ph-dock" }, PH_DOCK.map(id => ph(PhIcon, { key: id, id, onOpen: openApp })))), folder && ph(PhFolder, {
+    onClose: () => setFolder(false),
+    onPick: openPage
+  }), search && ph(PhSearch, {
+    onClose: () => setSearch(false),
+    onApp: openApp,
+    onPage: openPage
+  }), view && ph(PhView, {
+    view,
+    onBack: back,
+    onClose: closeView,
+    onPush: push
+  }), alert && ph(PhAlert, {
+    onClose: () => setAlert(false)
+  }), locked && ph(PhLock, {
+    onUnlock: unlock,
+    leaving: unlocking
+  })));
+}
+
+/* ---------- DESKTOP LOCK SCREEN (macOS style, every visit) --------------- */
+function DeskLock({
+  onUnlock,
+  leaving
+}) {
+  const clock = useMadridClock();
+  useEffect(() => {
+    const k = e => { if (!e.metaKey && !e.ctrlKey && !e.altKey) onUnlock(); };
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, [onUnlock]);
+  return ph("div", {
+    className: "dl" + (leaving ? " dl-out" : ""),
+    onClick: onUnlock,
+    role: "button",
+    tabIndex: 0,
+    "aria-label": "Click to enter"
+  }, ph("div", { className: "wallpaper" }), ph("div", { className: "dl-veil" }), ph("div", {
+    className: "dl-head"
+  }, ph("div", { className: "dl-date" }, phDate() + " \u00B7 Madrid"), ph("div", { className: "dl-time" }, clock.time)), ph("div", {
+    className: "dl-user"
+  }, ph("div", { className: "dl-avatar", role: "img", "aria-label": "Ivan Tejada's avatar" }), ph("div", { className: "dl-name" }, "Ivan Tejada"), ph("div", {
+    className: "dl-field"
+  }, ph("span", null, "Click anywhere to enter"), ph("span", { className: "dl-go" }, ph("svg", { viewBox: "0 0 16 16", "aria-hidden": "true" }, ph("path", { d: "M3 8h9M8.5 4l4 4-4 4", fill: "none", stroke: "currentColor", strokeWidth: 1.9, strokeLinecap: "round", strokeLinejoin: "round" })))), ph("div", { className: "dl-hint" }, "or press any key")));
 }
 
 /* ---------- APP ----------------------------------------------------------- */
@@ -1999,6 +2307,15 @@ function App() {
     errIdRef.current = e ? e.id : null;
   }, [wins]);
   const [welcomeReplay, setWelcomeReplay] = useState(0);
+  const [deskLocked, setDeskLocked] = useState(true);
+  const [deskLeaving, setDeskLeaving] = useState(false);
+  const deskLeavingRef = useRef(false);
+  const unlockDesk = useCallback(() => {
+    if (deskLeavingRef.current) return;
+    deskLeavingRef.current = true;
+    setDeskLeaving(true);
+    setTimeout(() => setDeskLocked(false), 620);
+  }, []);
   const dockById = useCallback(id => onDockAction({
     id,
     kind: "win"
@@ -2046,7 +2363,11 @@ function App() {
     onDock: dockById,
     onAboutDesigner: openAboutDesigner,
     onWelcome: () => setWelcomeReplay(n => n + 1)
+  }), deskLocked && /*#__PURE__*/React.createElement(DeskLock, {
+    onUnlock: unlockDesk,
+    leaving: deskLeaving
   }), /*#__PURE__*/React.createElement(Welcome, {
+    ready: !deskLocked,
     replay: welcomeReplay,
     busy: wins.length,
     onOpen: () => onDockAction({
@@ -2347,6 +2668,180 @@ html,body,#root{height:100%;margin:0;overflow:hidden;}
 @keyframes tipFlash{0%{opacity:1;}70%{opacity:1;}100%{opacity:0;}}
 @media (hover: none){.dock-item:hover .dock-tip{opacity:0;animation:tipFlash 1.6s ease forwards;}}
 
+/* ============================ DESKTOP LOCK SCREEN ============================ */
+.dl{position:fixed;inset:0;z-index:100020;overflow:hidden;cursor:pointer;outline:none;animation:phFade .35s ease both;}
+.dl-out{animation:dlOut .62s cubic-bezier(.5,0,.3,1) forwards;pointer-events:none;}
+@keyframes dlOut{from{opacity:1;transform:none;filter:none;}to{opacity:0;transform:scale(1.04);filter:blur(8px);}}
+.dl-veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,0.38) 100%);}
+.dl-head{position:absolute;z-index:2;top:5.5vh;left:0;right:0;text-align:center;color:#e70e0e;}
+.dl-date{font-size:clamp(17px,2.4vh,24px);font-weight:600;letter-spacing:.2px;}
+.dl-time{font-size:clamp(64px,12vh,128px);font-weight:700;line-height:1;letter-spacing:-0.03em;margin-top:2px;font-variant-numeric:tabular-nums;}
+.dl-user{position:absolute;z-index:2;left:0;right:0;bottom:8vh;display:flex;flex-direction:column;align-items:center;gap:10px;color:#fff;}
+.dl-avatar{width:76px;height:76px;border-radius:50%;background:#ddd url("avatar-dog.jpg") no-repeat center/cover;box-shadow:0 6px 20px rgba(0,0,0,0.35),0 0 0 2px rgba(255,255,255,0.55);}
+.dl-name{font-size:17px;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,0.5);}
+.dl-field{display:flex;align-items:center;gap:12px;height:34px;padding:0 5px 0 16px;border-radius:17px;font-size:13.5px;color:rgba(255,255,255,0.94);
+  background:rgba(255,255,255,0.22);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.38);}
+.dl-go{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,0.3);}
+.dl-go svg{width:13px;height:13px;}
+.dl-hint{font-size:12px;color:rgba(255,255,255,0.72);text-shadow:0 1px 3px rgba(0,0,0,0.4);}
+.dl:hover .dl-field{background:rgba(255,255,255,0.3);}
+
+/* ============================ iPHONE VERSION ============================ */
+.ph{position:fixed;inset:0;overflow:hidden;container-type:size;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Inter,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;color:#1d1d1f;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
+.ph button{-webkit-tap-highlight-color:transparent;}
+.ph-veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,0) 42%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0.42) 100%);}
+@keyframes phFade{from{opacity:0;}to{opacity:1;}}
+
+/* phone-only versions of the small-screen rules (independent of media queries) */
+.ph .wallpaper{background-image:none;background:${MOBILE_BG};background-size:cover;background-position:center;}
+.ph .aboutwin{flex-direction:column;}
+.ph .aboutwin-side{flex:0 0 auto;width:100%;flex-direction:row;align-items:center;gap:6px;border-right:0;border-bottom:0.5px solid rgba(0,0,0,0.1);padding:8px 12px;overflow-x:auto;}
+.ph .aboutwin-side-title{display:none;}
+.ph .aboutwin-tab{width:auto;padding:7px 12px;white-space:nowrap;}
+.ph .aboutwin-main p{overflow-wrap:break-word;}
+.ph .about-h1{font-size:32px;}
+.ph .sketch-head{flex-wrap:wrap;row-gap:10px;}
+.ph .sketch-tools{flex-wrap:wrap;}
+.ph .free-card{flex-direction:column;align-items:stretch;}.ph .free-thumb{width:100%;height:150px;flex:0 0 auto;}.ph .free-info{min-width:0;width:100%;}
+
+/* home screen */
+.ph-home{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:calc(10px + env(safe-area-inset-bottom));}
+.ph-home-hidden{opacity:0;}
+.ph-home-enter{animation:phHomeIn .6s cubic-bezier(.2,.85,.25,1) both;}
+@keyframes phHomeIn{from{opacity:0;transform:scale(1.1);}to{opacity:1;transform:none;}}
+.ph-grid{display:grid;grid-template-columns:repeat(4,1fr);row-gap:20px;padding:0 12px;margin-bottom:22px;}
+.ph-app{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;border:0;background:none;padding:0;font:inherit;cursor:pointer;}
+.ph-app:active .ph-ico{transform:scale(.92);filter:brightness(.85);}
+.ph-ico{position:relative;display:block;flex:0 0 auto;width:60px;height:60px;border-radius:14px;overflow:hidden;box-shadow:0 3px 10px rgba(0,0,0,0.22);transition:transform .12s ease,filter .12s ease;}
+.ph-ico > img{position:absolute;left:-3.4%;top:-3.4%;width:106.8%;height:106.8%;object-fit:cover;}
+.ph-ico > svg{display:block;width:100%;height:100%;}
+.ph-ico-error{background:#fff;}
+.ph-ico-error > img{left:14%;top:12%;width:72%;height:72%;object-fit:contain;}
+.ph-ico-cover{background-size:cover;background-position:center;}
+.ph-label{max-width:82px;font-size:12px;font-weight:500;line-height:1.2;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px rgba(0,0,0,0.7),0 0 8px rgba(0,0,0,0.35);}
+.ph-folder-ico{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:7px;background:rgba(255,255,255,0.3);box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.35),0 3px 10px rgba(0,0,0,0.18);}
+.ph-mini{display:block;border-radius:3px;overflow:hidden;background-size:cover;background-position:center;aspect-ratio:1;}
+.ph-mini svg{display:block;width:100%;height:100%;}
+.ph-searchpill{align-self:center;display:flex;align-items:center;gap:6px;height:30px;padding:0 15px;margin-bottom:14px;border:0;border-radius:15px;color:#fff;font:inherit;font-size:14px;font-weight:500;cursor:pointer;
+  background:rgba(255,255,255,0.2);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.28);}
+.ph-searchpill svg{width:14px;height:14px;}
+.ph-dock{display:grid;grid-template-columns:repeat(4,1fr);margin:0 10px;padding:14px 4px 10px;border-radius:34px;
+  background:rgba(255,255,255,0.2);-webkit-backdrop-filter:blur(26px) saturate(160%);backdrop-filter:blur(26px) saturate(160%);box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.28);}
+.ph-dock .ph-label{font-size:11px;}
+
+/* lock screen */
+.ph-lock{position:absolute;inset:0;z-index:50;overflow:hidden;cursor:pointer;outline:none;}
+.ph-lock-out{animation:phLockOut .52s cubic-bezier(.6,0,.3,1) forwards;}
+@keyframes phLockOut{from{transform:none;opacity:1;}to{transform:translateY(-100%);opacity:0.4;}}
+.ph-lock-head{position:absolute;z-index:2;top:calc(2.4vh + env(safe-area-inset-top));top:calc(2.4cqh + env(safe-area-inset-top));left:0;right:0;text-align:center;color:#e70e0e;}
+.ph-lock-pad{width:15px;height:15px;margin-bottom:4px;}
+.ph-lock-date{font-size:clamp(15px,2.3vh,19px);font-size:clamp(15px,2.3cqh,19px);font-weight:600;letter-spacing:.2px;}
+.ph-lock-time{font-size:clamp(56px,10.4vh,92px);font-size:clamp(56px,10.4cqh,92px);font-weight:700;line-height:1;letter-spacing:-0.03em;margin-top:2px;font-variant-numeric:tabular-nums;}
+.ph-lock-notif{position:absolute;z-index:2;left:10px;right:10px;bottom:calc(118px + env(safe-area-inset-bottom));padding:13px 16px 14px;border-radius:20px;text-align:left;color:#1d1d1f;
+  background:rgba(246,246,248,0.82);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);box-shadow:0 10px 30px -8px rgba(0,0,0,0.35);animation:phNotifIn .7s .35s cubic-bezier(.2,.9,.25,1.04) both;}
+@keyframes phNotifIn{from{opacity:0;transform:translateY(24px) scale(.97);}to{opacity:1;transform:none;}}
+.ph-lock-foot{position:absolute;z-index:2;left:0;right:0;bottom:calc(34px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-between;padding:0 44px;}
+.ph-lock-btn{display:flex;align-items:center;justify-content:center;width:50px;height:50px;border-radius:50%;color:#fff;background:rgba(0,0,0,0.3);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);}
+.ph-lock-btn svg{width:22px;height:22px;}
+.ph-lock-hint{font-size:13px;font-weight:600;color:rgba(255,255,255,0.88);animation:phHint 2.4s ease-in-out infinite;}
+@keyframes phHint{0%,100%{opacity:.55;}50%{opacity:1;}}
+.ph-homeind{position:absolute;z-index:2;left:50%;bottom:calc(8px + env(safe-area-inset-bottom));width:134px;height:5px;border-radius:3px;background:rgba(255,255,255,0.92);transform:translateX(-50%);}
+
+/* apps (full screen) */
+.ph-view{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;overflow:hidden;background:#fbfbfd;animation:phOpen .42s cubic-bezier(.2,.85,.25,1) both;}
+.ph-view-grey{background:#f2f2f7;}
+.ph-view-out{animation:phClose .3s cubic-bezier(.5,0,.75,0) forwards;}
+@keyframes phOpen{from{transform:scale(.14);opacity:.3;border-radius:60px;}to{transform:none;opacity:1;border-radius:0;}}
+@keyframes phClose{from{transform:none;opacity:1;border-radius:0;}to{transform:scale(.14);opacity:0;border-radius:60px;}}
+.ph-nav{flex:0 0 auto;position:relative;z-index:2;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:calc(46px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 6px 0;
+  background:rgba(250,250,252,0.9);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);border-bottom:0.5px solid rgba(0,0,0,0.12);}
+.ph-view-grey .ph-nav{background:rgba(242,242,247,0.92);}
+.ph-back{justify-self:start;display:flex;align-items:center;gap:4px;max-width:140px;padding:6px 8px;border:0;background:none;color:#0a7cff;font:inherit;font-size:17px;cursor:pointer;}
+.ph-back span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ph-back svg{flex:0 0 auto;width:11px;height:19px;}
+.ph-nav-title{max-width:48vw;max-width:48cqw;font-size:16px;font-weight:600;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ph-body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(30px + env(safe-area-inset-bottom));}
+.ph-body-fill{overflow:hidden;padding-bottom:0;}
+.ph-body-fill .aboutwin{height:100%;}
+.ph-body-fill .aboutwin-main{padding-bottom:calc(30px + env(safe-area-inset-bottom));}
+.ph-push{animation:phPush .34s cubic-bezier(.2,.85,.25,1) both;}
+.ph-pop{animation:phPop .34s cubic-bezier(.2,.85,.25,1) both;}
+@keyframes phPush{from{transform:translateX(30%);opacity:.2;}to{transform:none;opacity:1;}}
+@keyframes phPop{from{transform:translateX(-22%);opacity:.4;}to{transform:none;opacity:1;}}
+.ph-homebar{position:absolute;z-index:3;left:50%;bottom:0;transform:translateX(-50%);display:flex;justify-content:center;align-items:flex-start;width:180px;height:calc(22px + env(safe-area-inset-bottom));padding:9px 0 0;border:0;background:none;cursor:pointer;}
+.ph-homebar span{width:134px;height:5px;border-radius:3px;background:rgba(0,0,0,0.85);}
+.ph-body p,.ph-body h1,.ph-body h2,.ph-body h3,.ph-body li,.ph-body a{-webkit-user-select:text;user-select:text;}
+.ph-body .about-doc{padding:26px 22px 36px;max-width:none;}
+.ph-body .aboutwin-main .about-doc{padding:24px 22px 36px;}
+.ph-body .contact-doc{padding:26px 22px 36px;max-width:none;}
+.ph-body .info-doc{padding:16px 16px 30px;}
+
+/* My Work */
+.ph-work{padding:6px 16px 20px;}
+.ph-large{font-size:32px;font-weight:700;letter-spacing:-0.5px;margin:4px 0 2px;}
+.ph-work-sub{font-size:14px;color:#8e8e93;margin:0 0 16px;}
+.ph-work-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px 14px;}
+.ph-work-item{display:flex;flex-direction:column;align-items:flex-start;min-width:0;padding:0;border:0;background:none;font:inherit;color:#1d1d1f;text-align:left;cursor:pointer;}
+.ph-work-item:active .ph-work-thumb{filter:brightness(.88);}
+.ph-work-thumb{display:block;width:100%;aspect-ratio:1;border-radius:12px;background-size:cover;background-position:center;box-shadow:0 0 0 0.5px rgba(0,0,0,0.08);}
+.ph-work-name{font-size:14px;font-weight:600;line-height:1.25;margin-top:8px;}
+.ph-work-meta{font-size:12px;line-height:1.3;color:#8e8e93;margin-top:2px;}
+
+/* Settings > About */
+.ph-set{padding:10px 16px 10px;}
+.ph-set-card{display:flex;flex-direction:column;align-items:center;padding:10px 0 22px;}
+.ph-set-avatar{width:88px;height:88px;border-radius:50%;background:#ddd url("avatar-dog.jpg") no-repeat center/cover;box-shadow:0 4px 14px rgba(0,0,0,0.16);}
+.ph-set-name{font-size:22px;font-weight:700;letter-spacing:-0.3px;margin-top:12px;}
+.ph-set-sub{font-size:14px;color:#8e8e93;margin-top:2px;}
+.ph-set-group{margin-bottom:22px;border-radius:12px;overflow:hidden;background:#fff;}
+.ph-set-row{position:relative;display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:12px 16px;font-size:16px;color:#1d1d1f;text-decoration:none;}
+.ph-set-row + .ph-set-row::before{content:"";position:absolute;top:0;left:16px;right:0;height:0.5px;background:rgba(60,60,67,0.18);}
+.ph-set-k{flex:0 0 auto;}
+.ph-set-v{font-size:15px;color:#8e8e93;text-align:right;}
+.ph-set-link{justify-content:center;color:#0a7cff;}
+.ph-set-foot{margin:0;font-size:12px;color:#8e8e93;text-align:center;}
+
+/* Ideas Folder (iOS folder) */
+.ph-folder-ov{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  background:rgba(0,0,0,0.18);-webkit-backdrop-filter:blur(26px) saturate(150%);backdrop-filter:blur(26px) saturate(150%);animation:phFade .22s ease both;}
+.ph-folder-title{font-size:30px;font-weight:700;letter-spacing:-0.4px;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,0.3);}
+.ph-folder-sub{max-width:290px;margin-top:-8px;font-size:15px;line-height:1.4;text-align:center;color:rgba(255,255,255,0.9);text-shadow:0 1px 6px rgba(0,0,0,0.4);}
+.ph-folder-panel{display:grid;grid-template-columns:repeat(3,1fr);row-gap:20px;width:min(320px,calc(100vw - 48px));width:min(320px,calc(100cqw - 48px));padding:24px 14px 20px;border-radius:38px;background:rgba(255,255,255,0.24);animation:phPanelIn .32s cubic-bezier(.2,.9,.25,1.05) both;}
+@keyframes phPanelIn{from{opacity:0;transform:scale(.6);}to{opacity:1;transform:none;}}
+
+/* Search */
+.ph-search-ov{position:absolute;inset:0;z-index:45;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);
+  background:rgba(20,20,24,0.4);-webkit-backdrop-filter:blur(30px) saturate(160%);backdrop-filter:blur(30px) saturate(160%);animation:phFade .2s ease both;}
+.ph-search-bar{display:flex;align-items:center;gap:10px;padding:14px 14px 8px;}
+.ph-search-field{flex:1;display:flex;align-items:center;gap:8px;height:38px;padding:0 12px;border-radius:12px;color:#8e8e93;background:rgba(255,255,255,0.9);}
+.ph-search-field svg{flex:0 0 auto;width:16px;height:16px;}
+.ph-search-field input{flex:1;min-width:0;border:0;background:none;outline:none;font:inherit;font-size:16px;color:#1d1d1f;-webkit-appearance:none;appearance:none;}
+.ph-search-cancel{border:0;background:none;padding:4px 2px;color:#fff;font:inherit;font-size:17px;cursor:pointer;}
+.ph-search-list{flex:1;min-height:0;overflow-y:auto;padding:0 14px calc(30px + env(safe-area-inset-bottom));}
+.ph-search-h{margin:16px 4px 8px;font-size:13px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:rgba(255,255,255,0.78);}
+.ph-search-group{border-radius:14px;overflow:hidden;background:rgba(255,255,255,0.9);}
+.ph-search-row{position:relative;display:flex;align-items:center;gap:12px;width:100%;padding:9px 12px;border:0;background:none;font:inherit;color:#1d1d1f;text-align:left;cursor:pointer;}
+.ph-search-row + .ph-search-row::before{content:"";position:absolute;top:0;left:64px;right:0;height:0.5px;background:rgba(60,60,67,0.18);}
+.ph-search-row > span:last-child{display:flex;flex-direction:column;min-width:0;}
+.ph-search-ico{position:relative;flex:0 0 auto;width:40px;height:40px;border-radius:9px;overflow:hidden;background-size:cover;background-position:center;}
+.ph-search-ico > img{position:absolute;left:-3.4%;top:-3.4%;width:106.8%;height:106.8%;object-fit:cover;}
+.ph-search-ico > svg{display:block;width:100%;height:100%;}
+.ph-search-t{font-size:15px;font-weight:600;line-height:1.25;}
+.ph-search-m{font-size:12.5px;color:#8e8e93;margin-top:1px;}
+.ph-search-empty{margin-top:40px;font-size:15px;color:rgba(255,255,255,0.85);text-align:center;}
+
+/* Error as an iOS alert */
+.ph-alert-ov{position:absolute;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);animation:phFade .2s ease both;}
+.ph-alert{width:280px;border-radius:16px;overflow:hidden;text-align:center;background:rgba(242,242,247,0.94);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);animation:phAlertIn .28s cubic-bezier(.2,.9,.25,1.1) both;}
+@keyframes phAlertIn{from{opacity:0;transform:scale(1.15);}to{opacity:1;transform:none;}}
+.ph-alert-body{padding:20px 18px 16px;}
+.ph-alert-ico{width:44px;height:44px;margin-bottom:8px;}
+.ph-alert-title{font-size:17px;font-weight:700;line-height:1.3;}
+.ph-alert-text{margin:6px 0 0;font-size:13px;line-height:1.4;color:#3a3a3c;}
+.ph-alert-btn{display:block;width:100%;padding:12px;border:0;border-top:0.5px solid rgba(60,60,67,0.25);background:none;font:inherit;font-size:17px;font-weight:600;color:#0a7cff;cursor:pointer;}
+@media (prefers-reduced-motion: reduce){.ph-view,.ph-view-out,.ph-push,.ph-pop,.ph-home-enter,.ph-lock-out,.ph-folder-panel,.ph-lock-notif,.ph-alert{animation-duration:.01s !important;}}
+
+
 /* ============================ MOBILE ONLY ============================ */
 @media (max-width: 1024px){.wallpaper{background-image:none !important;background:${MOBILE_BG} !important;background-size:cover !important;background-position:center !important;}/* Dock: barra vertical izquierda en móvil/tablet (≤1024px) */.dock-wrap{left:0;right:auto;bottom:auto;top:50%;transform:translateY(-50%);justify-content:flex-start;}.dock{flex-direction:column;align-items:center;gap:7px;padding:10px 7px;border-radius:19px;margin-left:7px;max-width:none;overflow:visible;}.dock-item{transform:none !important;transition:none !important;transform-origin:left center;}.dock-tile{width:44px;height:44px;border-radius:11px;}.dock-img{width:44px;height:44px;}.dock-sep{width:30px;height:1px;margin:3px 0;align-self:center;}.tl.yellow{display:none !important;}.dock-tip{bottom:auto;top:50%;left:calc(100% + 10px);transform:translateY(-50%);}.dock-tip::after{top:50%;left:auto;right:100%;transform:translateY(-50%);border:5px solid transparent;border-right-color:rgba(40,40,45,0.94);border-top-color:transparent;}}
 
@@ -2388,7 +2883,7 @@ html,body,#root{height:100%;margin:0;overflow:hidden;}
 }
 `;
 try {
-  ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+  ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(IS_MOBILE ? PhoneApp : App));
   var b = document.getElementById('boot'); if (b) b.remove();
 } catch (e) {
   document.getElementById('boot').textContent = 'Error: ' + e.message;
