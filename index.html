@@ -1814,7 +1814,7 @@ function Welcome({
     className: "notif-head"
   }, /*#__PURE__*/React.createElement("span", null, "IVAN TEJADA"), /*#__PURE__*/React.createElement("span", null, "now")), /*#__PURE__*/React.createElement("div", {
     className: "notif-title"
-  }, "Hi, I’m Ivan. Make yourself at home."), /*#__PURE__*/React.createElement("div", {
+  }, "Quick tip"), /*#__PURE__*/React.createElement("div", {
     className: "notif-text"
   }, verb + " any image to see the project. To learn more about me or get in touch, use the icons " + where + ".")));
 }
@@ -1898,8 +1898,60 @@ function phDate() {
     return new Date().toDateString();
   }
 }
+/* ---------- LOCK SCREEN NOTIFICATIONS (phone + desktop) ------------------- */
+const LN_SCREENTIME_SVG = ph("svg", {
+  viewBox: "0 0 60 60",
+  "aria-hidden": "true"
+}, ph("defs", null, ph("linearGradient", { id: "lnStBg", x1: 0, y1: 0, x2: 0, y2: 1 }, ph("stop", { offset: 0, stopColor: "#9b6bff" }), ph("stop", { offset: 1, stopColor: "#5a2ad6" }))), ph("rect", { width: 60, height: 60, fill: "url(#lnStBg)" }), ph("path", { d: "M19 14h22M19 46h22", stroke: "#fff", strokeWidth: 3.4, strokeLinecap: "round" }), ph("path", { d: "M22 16h16c0 7-8 10-8 14 0-4-8-7-8-14zM22 44h16c0-6-8-9-8-14 0 5-8 8-8 14z", fill: "#fff" }));
+function lockNotes() {
+  return [{
+    id: "welcome",
+    icon: ph("span", { className: "ln-avatar" }),
+    round: true,
+    title: "Ivan Tejada",
+    time: "now",
+    text: "Hi, I’m Ivan. Make yourself at home.",
+    open: null
+  }, {
+    id: "photos",
+    icon: ph("img", { src: PH_ICON("work"), alt: "" }),
+    title: "Memories",
+    time: "2m ago",
+    text: PROJECTS.length + " projects you haven’t seen yet.",
+    open: "work"
+  }, {
+    id: "mail",
+    icon: ph("img", { src: PH_ICON("contact"), alt: "" }),
+    title: "New brief",
+    time: "14m ago",
+    text: "“Can you make the logo bigger?”",
+    open: null
+  }, {
+    id: "screentime",
+    icon: LN_SCREENTIME_SVG,
+    title: "Screen Time",
+    time: "1h ago",
+    text: "You spent 6 hours in Photoshop yesterday. Impressive.",
+    open: null
+  }];
+}
+function LockNotes({
+  className,
+  onOpen
+}) {
+  return ph("div", {
+    className: "ln-wrap " + (className || "")
+  }, lockNotes().map((n, i) => ph("button", {
+    key: n.id,
+    type: "button",
+    className: "ln",
+    style: { animationDelay: (0.6 + i * 0.95).toFixed(2) + "s" },
+    onClick: e => { e.stopPropagation(); onOpen(n.open); }
+  }, ph("span", { className: "ln-ico" + (n.round ? " round" : "") }, n.icon), ph("span", { className: "ln-main" }, ph("span", { className: "ln-top" }, ph("span", { className: "ln-title" }, n.title), ph("span", { className: "ln-time" }, n.time)), ph("span", { className: "ln-text" }, n.text)))));
+}
 function PhLock({
   onUnlock,
+  onOpen,
   leaving
 }) {
   const clock = useMadridClock();
@@ -1912,9 +1964,7 @@ function PhLock({
     onKeyDown: e => { if (e.key === "Enter" || e.key === " ") onUnlock(); }
   }, ph("div", { className: "wallpaper" }), ph("div", {
     className: "ph-lock-head"
-  }, ph("svg", { className: "ph-lock-pad", viewBox: "0 0 24 24", "aria-hidden": "true" }, ph("path", { d: "M7.5 10.5V7.8a4.5 4.5 0 0 1 9 0v2.7", fill: "none", stroke: "currentColor", strokeWidth: 2.2, strokeLinecap: "round" }), ph("rect", { x: 5, y: 10.5, width: 14, height: 10.5, rx: 2.6, fill: "currentColor" })), ph("div", { className: "ph-lock-date" }, phDate() + " \u00B7 Madrid"), ph("div", { className: "ph-lock-time" }, clock.time)), ph("div", {
-    className: "ph-lock-notif"
-  }, ph("div", { className: "notif-head" }, ph("span", null, "IVAN TEJADA"), ph("span", null, "now")), ph("div", { className: "notif-title" }, "Hi, I’m Ivan. Make yourself at home."), ph("div", { className: "notif-text" }, "Open Work to see my projects. To learn more about me or get in touch, use the apps on the home screen.")), ph("div", {
+  }, ph("svg", { className: "ph-lock-pad", viewBox: "0 0 24 24", "aria-hidden": "true" }, ph("path", { d: "M7.5 10.5V7.8a4.5 4.5 0 0 1 9 0v2.7", fill: "none", stroke: "currentColor", strokeWidth: 2.2, strokeLinecap: "round" }), ph("rect", { x: 5, y: 10.5, width: 14, height: 10.5, rx: 2.6, fill: "currentColor" })), ph("div", { className: "ph-lock-date" }, phDate() + " \u00B7 Madrid"), ph("div", { className: "ph-lock-time" }, clock.time)), ph(LockNotes, { className: "ph-notes", onOpen: onOpen }), ph("div", {
     className: "ph-lock-foot"
   }, ph("span", { className: "ph-lock-btn" }, ph("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, ph("path", { d: "M8.5 2.5h7v3.2l-1.6 3v11.3a1.4 1.4 0 0 1-1.4 1.5h-1a1.4 1.4 0 0 1-1.4-1.5V8.7l-1.6-3z", fill: "currentColor" }))), ph("span", { className: "ph-lock-hint" }, "Tap anywhere to open"), ph("span", { className: "ph-lock-btn" }, ph("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, ph("path", { d: "M8.2 6.5l1.4-2.2h4.8l1.4 2.2H19a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8.5a2 2 0 0 1 2-2z", fill: "currentColor" }), ph("circle", { cx: 12, cy: 13, r: 3.6, fill: "#2a2a2e" })))), ph("span", { className: "ph-homeind" }));
 }
@@ -1931,7 +1981,63 @@ function PhWork({
     onClick: () => onOpen(p)
   }, ph("span", { className: "ph-work-thumb", style: phThumbStyle(p) }), ph("span", { className: "ph-work-name" }, p.short), p.meta && ph("span", { className: "ph-work-meta" }, p.meta)))));
 }
-function PhSettings() {
+const PH_POWER_SVG = ph("svg", {
+  viewBox: "0 0 24 24",
+  "aria-hidden": "true"
+}, ph("path", { d: "M12 3.5v8", stroke: "currentColor", strokeWidth: 2.4, strokeLinecap: "round" }), ph("path", { d: "M6.6 6.9a7.6 7.6 0 1 0 10.8 0", fill: "none", stroke: "currentColor", strokeWidth: 2.4, strokeLinecap: "round" }));
+function PhPower({
+  onCancel,
+  onConfirm
+}) {
+  const [x, setX] = useState(0);
+  const [drag, setDrag] = useState(false);
+  const track = useRef(null);
+  const start = useRef(null);
+  const max = () => track.current ? track.current.offsetWidth - 64 : 236;
+  const down = e => {
+    start.current = { sx: e.clientX, x };
+    setDrag(true);
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+  };
+  const move = e => {
+    if (!start.current || !track.current) return;
+    const r = track.current.getBoundingClientRect();
+    const s = r.width / (track.current.offsetWidth || r.width) || 1;
+    setX(Math.max(0, Math.min(max(), start.current.x + (e.clientX - start.current.sx) / s)));
+  };
+  const up = () => {
+    if (!start.current) return;
+    start.current = null;
+    setDrag(false);
+    if (x >= max() * 0.8) { setX(max()); setTimeout(onConfirm, 200); } else setX(0);
+  };
+  const m = max() || 1;
+  return ph("div", {
+    className: "ph-off-ov"
+  }, ph("div", {
+    className: "ph-off-track",
+    ref: track
+  }, ph("span", { className: "ph-off-text", style: { opacity: Math.max(0, 1 - x / (m * 0.6)) } }, "slide to power off"), ph("span", {
+    className: "ph-off-knob" + (drag ? " drag" : ""),
+    style: { transform: "translateX(" + x + "px)" },
+    role: "slider",
+    "aria-label": "Slide to power off",
+    "aria-valuemin": 0,
+    "aria-valuemax": 100,
+    "aria-valuenow": Math.round(x / m * 100),
+    onPointerDown: down,
+    onPointerMove: move,
+    onPointerUp: up,
+    onPointerCancel: up
+  }, PH_POWER_SVG)), ph("button", {
+    type: "button",
+    className: "ph-off-cancel",
+    onClick: onCancel
+  }, ph("span", { className: "ph-off-x" }, "✕"), ph("span", null, "Cancel")));
+}
+function PhSettings({
+  onShutDown
+}) {
   const rows = [["Memory", "64 GB of references"], ["Graphics", "Pixel-perfect, mostly"], ["Startup Disk", "Coffee and a deadline"], ["Compatibility", "Works with teams of any size"], ["Software Update", "Learning every day"]];
   return ph("div", {
     className: "ph-set"
@@ -1939,7 +2045,9 @@ function PhSettings() {
     className: "ph-set-group"
   }, rows.map(r => ph("div", { key: r[0], className: "ph-set-row" }, ph("span", { className: "ph-set-k" }, r[0]), ph("span", { className: "ph-set-v" }, r[1])))), ph("div", {
     className: "ph-set-group"
-  }, ph("a", { className: "ph-set-row ph-set-link", href: CV_PDF, download: "Ivan_Tejada_CV_EN.pdf" }, "Download CV")), ph("p", { className: "ph-set-foot" }, "™ and © " + new Date().getFullYear() + " Ivan Tejada. All ideas reserved."));
+  }, ph("a", { className: "ph-set-row ph-set-link", href: CV_PDF, download: "Ivan_Tejada_CV_EN.pdf" }, "Download CV")), ph("div", {
+    className: "ph-set-group"
+  }, ph("button", { type: "button", className: "ph-set-row ph-set-link ph-set-btn", onClick: onShutDown }, "Shut Down")), ph("p", { className: "ph-set-foot" }, "™ and © " + new Date().getFullYear() + " Ivan Tejada. All ideas reserved."));
 }
 function PhAlert({
   onClose
@@ -1999,7 +2107,8 @@ function PhView({
   view,
   onBack,
   onClose,
-  onPush
+  onPush,
+  onShutDown
 }) {
   const page = view.stack[view.stack.length - 1];
   const rootTitle = view.id === "page" ? phPageTitle(view.root) : view.id === "work" ? "My Work" : (PH_APPS[view.id] || {}).title || "";
@@ -2010,7 +2119,7 @@ function PhView({
   else if (view.id === "about") body = ph(AboutWindow);
   else if (view.id === "contact") body = ph(ContactContent);
   else if (view.id === "work") body = ph(PhWork, { onOpen: p => onPush({ kind: "project", p }) });
-  else if (view.id === "settings") body = ph(PhSettings);
+  else if (view.id === "settings") body = ph(PhSettings, { onShutDown });
   else if (MINDS[view.id]) body = ph(MindContent, MINDS[view.id]);
   const title = page ? phPageTitle(page) : view.id === "work" ? "" : rootTitle;
   const backLabel = page ? rootTitle : "Home";
@@ -2031,6 +2140,8 @@ function PhoneApp() {
   const [folder, setFolder] = useState(false);
   const [alert, setAlert] = useState(false);
   const [search, setSearch] = useState(false);
+  const [power, setPower] = useState(false);
+  const [shut, setShut] = useState(null); /* null | down | joke | out */
   const startedLocked = useRef(locked);
   const unlock = () => {
     if (unlocking) return;
@@ -2063,6 +2174,18 @@ function PhoneApp() {
     setTimeout(() => setView(null), 300);
   };
   const push = page => setView(v => v && { ...v, stack: v.stack.concat([page]), dir: "fwd" });
+  const openFromNote = id => {
+    unlock();
+    if (id) setTimeout(() => openApp(id, null), 560);
+  };
+  const shutDown = () => {
+    setPower(false);
+    setShut("down");
+    setTimeout(() => setShut("joke"), 1500);
+    setTimeout(() => { setView(null); setFolder(false); setSearch(false); setAlert(false); setUnlocking(false); setLocked(true); }, 3300);
+    setTimeout(() => setShut("out"), 3600);
+    setTimeout(() => setShut(null), 4300);
+  };
   const back = () => {
     if (view && view.stack.length) setView(v => ({ ...v, stack: v.stack.slice(0, -1), dir: "back" }));
     else closeView();
@@ -2087,18 +2210,26 @@ function PhoneApp() {
     view,
     onBack: back,
     onClose: closeView,
-    onPush: push
+    onPush: push,
+    onShutDown: () => setPower(true)
   }), alert && ph(PhAlert, {
     onClose: () => setAlert(false)
   }), locked && ph(PhLock, {
     onUnlock: unlock,
+    onOpen: openFromNote,
     leaving: unlocking
-  })));
+  }), power && ph(PhPower, {
+    onCancel: () => setPower(false),
+    onConfirm: shutDown
+  }), shut && ph("div", {
+    className: "shut" + (shut === "out" ? " shut-out" : "")
+  }, shut === "down" ? "Shutting down…" : "Just kidding. Ideas don’t shut down.")));
 }
 
 /* ---------- DESKTOP LOCK SCREEN (macOS style, every visit) --------------- */
 function DeskLock({
   onUnlock,
+  onOpen,
   leaving
 }) {
   const clock = useMadridClock();
@@ -2115,7 +2246,10 @@ function DeskLock({
     "aria-label": "Click to enter"
   }, ph("div", { className: "wallpaper" }), ph("div", { className: "dl-veil" }), ph("div", {
     className: "dl-head"
-  }, ph("div", { className: "dl-date" }, phDate() + " \u00B7 Madrid"), ph("div", { className: "dl-time" }, clock.time)), ph("div", {
+  }, ph("div", { className: "dl-date" }, phDate() + " \u00B7 Madrid"), ph("div", { className: "dl-time" }, clock.time)), ph(LockNotes, {
+    className: "dl-notes",
+    onOpen: onOpen
+  }), ph("div", {
     className: "dl-user"
   }, ph("div", { className: "dl-avatar", role: "img", "aria-label": "Ivan Tejada's avatar" }), ph("div", { className: "dl-name" }, "Ivan Tejada"), ph("div", {
     className: "dl-field"
@@ -2364,6 +2498,10 @@ function App() {
     onAboutDesigner: openAboutDesigner,
     onWelcome: () => setWelcomeReplay(n => n + 1)
   }), deskLocked && /*#__PURE__*/React.createElement(DeskLock, {
+    onOpen: id => {
+      unlockDesk();
+      if (id) setTimeout(() => dockById(id), 650);
+    },
     onUnlock: unlockDesk,
     leaving: deskLeaving
   }), /*#__PURE__*/React.createElement(Welcome, {
@@ -2669,7 +2807,7 @@ html,body,#root{height:100%;margin:0;overflow:hidden;}
 @media (hover: none){.dock-item:hover .dock-tip{opacity:0;animation:tipFlash 1.6s ease forwards;}}
 
 /* ============================ DESKTOP LOCK SCREEN ============================ */
-.dl{position:fixed;inset:0;z-index:100020;overflow:hidden;cursor:pointer;outline:none;animation:phFade .35s ease both;}
+.dl{position:fixed;inset:0;z-index:100020;overflow:hidden;cursor:pointer;outline:none;background:#e9e9e9;}
 .dl-out{animation:dlOut .62s cubic-bezier(.5,0,.3,1) forwards;pointer-events:none;}
 @keyframes dlOut{from{opacity:1;transform:none;filter:none;}to{opacity:0;transform:scale(1.04);filter:blur(8px);}}
 .dl-veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,0.38) 100%);}
@@ -2685,6 +2823,41 @@ html,body,#root{height:100%;margin:0;overflow:hidden;}
 .dl-go svg{width:13px;height:13px;}
 .dl-hint{font-size:12px;color:rgba(255,255,255,0.72);text-shadow:0 1px 3px rgba(0,0,0,0.4);}
 .dl:hover .dl-field{background:rgba(255,255,255,0.3);}
+
+/* lock screen notifications (phone + desktop) */
+.ln-wrap{display:flex;flex-direction:column;gap:8px;}
+.ln{display:flex;align-items:flex-start;gap:11px;width:100%;padding:11px 14px 12px 11px;border:0;border-radius:20px;text-align:left;font:inherit;color:#1d1d1f;cursor:pointer;
+  background:rgba(246,246,248,0.84);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);box-shadow:0 8px 24px -8px rgba(0,0,0,0.35);animation:lnIn .75s cubic-bezier(.2,.9,.25,1.04) both;}
+@keyframes lnIn{from{opacity:0;transform:translateY(18px) scale(.97);}to{opacity:1;transform:none;}}
+.ln:hover{background:rgba(250,250,252,0.92);}
+.ln-ico{position:relative;flex:0 0 auto;width:38px;height:38px;margin-top:1px;border-radius:9px;overflow:hidden;}
+.ln-ico.round{border-radius:50%;}
+.ln-ico > img{position:absolute;left:-3.4%;top:-3.4%;width:106.8%;height:106.8%;object-fit:cover;}
+.ln-ico > svg{display:block;width:100%;height:100%;}
+.ln-avatar{display:block;width:100%;height:100%;background:#ddd url("avatar-dog.jpg") no-repeat center/cover;}
+.ln-main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.ln-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;}
+.ln-title{font-size:14.5px;font-weight:700;line-height:1.3;}
+.ln-time{flex:0 0 auto;font-size:12px;color:#6e6e73;}
+.ln-text{margin-top:1px;font-size:14px;line-height:1.35;color:#3a3a3c;}
+.ph-notes{position:absolute;z-index:2;left:10px;right:10px;bottom:calc(112px + env(safe-area-inset-bottom));}
+@container (max-height: 700px){.ph-notes .ln:nth-child(4){display:none;}}
+.dl-notes{position:absolute;z-index:3;right:24px;bottom:24px;width:370px;}
+@media (max-width: 1100px){.dl-notes{right:auto;left:50%;transform:translateX(-50%);bottom:calc(8vh + 196px);width:min(380px,calc(100vw - 32px));}}
+
+/* phone: slide to power off */
+.ph-off-ov{position:absolute;inset:0;z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:calc(70px + env(safe-area-inset-top)) 0 calc(70px + env(safe-area-inset-bottom));
+  background:rgba(0,0,0,0.5);-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px);animation:phFade .25s ease both;}
+.ph-off-track{position:relative;width:300px;max-width:calc(100% - 60px);height:64px;border-radius:32px;background:rgba(255,255,255,0.2);box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.25);}
+.ph-off-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-left:56px;font-size:17px;font-weight:500;pointer-events:none;
+  color:transparent;background:linear-gradient(90deg,rgba(255,255,255,0.45) 0%,#fff 50%,rgba(255,255,255,0.45) 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;animation:phShimmer 2.4s linear infinite;}
+@keyframes phShimmer{from{background-position:100% 0;}to{background-position:-100% 0;}}
+.ph-off-knob{position:absolute;left:4px;top:4px;display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:#fff;color:#ff3b30;cursor:grab;touch-action:none;transition:transform .28s cubic-bezier(.2,.9,.3,1);}
+.ph-off-knob.drag{transition:none;cursor:grabbing;}
+.ph-off-knob svg{width:26px;height:26px;}
+.ph-off-cancel{display:flex;flex-direction:column;align-items:center;gap:8px;border:0;background:none;color:#fff;font:inherit;font-size:14px;cursor:pointer;}
+.ph-off-x{display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;font-size:22px;background:rgba(255,255,255,0.2);}
+.ph-set-btn{width:100%;border:0;background:none;font:inherit;font-size:16px;cursor:pointer;}
 
 /* ============================ iPHONE VERSION ============================ */
 .ph{position:fixed;inset:0;overflow:hidden;container-type:size;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Inter,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;color:#1d1d1f;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
@@ -2730,7 +2903,7 @@ html,body,#root{height:100%;margin:0;overflow:hidden;}
 .ph-dock .ph-label{font-size:11px;}
 
 /* lock screen */
-.ph-lock{position:absolute;inset:0;z-index:50;overflow:hidden;cursor:pointer;outline:none;}
+.ph-lock{position:absolute;inset:0;z-index:50;overflow:hidden;cursor:pointer;outline:none;background:#e9e9e9;}
 .ph-lock-out{animation:phLockOut .52s cubic-bezier(.6,0,.3,1) forwards;}
 @keyframes phLockOut{from{transform:none;opacity:1;}to{transform:translateY(-100%);opacity:0.4;}}
 .ph-lock-head{position:absolute;z-index:2;top:calc(2.4vh + env(safe-area-inset-top));top:calc(2.4cqh + env(safe-area-inset-top));left:0;right:0;text-align:center;color:#e70e0e;}
